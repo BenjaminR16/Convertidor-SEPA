@@ -1,4 +1,4 @@
-package com.sstrategy.convertidor_sepa.model.dto;
+package com.sstrategy.convertidor_sepa.dto;
 
 import java.time.LocalDateTime;
 
