@@ -1,10 +1,7 @@
 package com.sstrategy.convertidor_sepa.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.sstrategy.convertidor_sepa.dto.FileInfo;
@@ -13,6 +10,7 @@ import com.sstrategy.convertidor_sepa.service.MetadataService;
 @RestController
 @RequestMapping("/executive-view")
 public class ExecutiveViewController {
+
     private final MetadataService metadataService;
 
     public ExecutiveViewController(MetadataService metadataService) {
@@ -20,15 +18,31 @@ public class ExecutiveViewController {
     }
 
     @PostMapping("/metadata")
-    public ResponseEntity<FileInfo> metadata(
+    public ResponseEntity<?> metadata(
             @RequestParam("file") MultipartFile file,
-            @RequestParam("type") String type) throws Exception {
-        return ResponseEntity.ok(
-                metadataService.extractMetadata(file.getBytes(), file.getOriginalFilename(), type));
+            @RequestParam("type") String type) {
+        try {
+            FileInfo info = metadataService.extractMetadata(
+                    file.getBytes(),
+                    file.getOriginalFilename(),
+                    type);
+            return ResponseEntity.ok(info);
+        } catch (Exception e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Error al extraer metadata: " + e.getMessage());
+        }
     }
 
     @PostMapping("/xml")
-    public ResponseEntity<String> xml(@RequestParam("file") MultipartFile file) throws Exception {
-        return ResponseEntity.ok(new String(file.getBytes()));
+    public ResponseEntity<?> xml(@RequestParam("file") MultipartFile file) {
+        try {
+            String xmlText = new String(file.getBytes(), "UTF-8");
+            return ResponseEntity.ok(xmlText);
+        } catch (Exception e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Error al leer XML: " + e.getMessage());
+        }
     }
 }
