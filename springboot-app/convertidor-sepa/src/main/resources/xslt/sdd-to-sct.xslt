@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:sct="urn:iso:std:iso:20022:tech:xsd:pain.001.001.03"
-    xmlns:sdd="urn:iso:std:iso:20022:tech:xsd:pain.008.001.02"
+    xmlns:sdd="urn:iso:std:iso:20022:tech:xsd:pain.008.001.08"
+    xmlns:sct="urn:iso:std:iso:20022:tech:xsd:pain.001.001.09"
     exclude-result-prefixes="sdd">
 
-    <xsl:output method="xml" indent="yes"/>
+    <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
+
     <xsl:template match="/">
         <sct:Document>
             <sct:CstmrCdtTrfInitn>
@@ -20,13 +21,15 @@
                         </sct:InitgPty>
                     </sct:GrpHdr>
                 </xsl:for-each>
-
                 <xsl:for-each select="//sdd:PmtInf">
                     <sct:PmtInf>
                         <sct:PmtInfId><xsl:value-of select="sdd:PmtInfId"/></sct:PmtInfId>
                         <sct:PmtMtd>TRF</sct:PmtMtd>
                         <sct:NbOfTxs><xsl:value-of select="sdd:NbOfTxs"/></sct:NbOfTxs>
                         <sct:CtrlSum><xsl:value-of select="sdd:CtrlSum"/></sct:CtrlSum>
+                        <sct:ReqdExctnDt>
+                            <sct:Dt><xsl:value-of select="sdd:ReqdColltnDt"/></sct:Dt>
+                        </sct:ReqdExctnDt>
                         <sct:Dbtr>
                             <sct:Nm><xsl:value-of select="sdd:Dbtr/sdd:Nm"/></sct:Nm>
                         </sct:Dbtr>
@@ -35,6 +38,11 @@
                                 <sct:IBAN><xsl:value-of select="sdd:DbtrAcct/sdd:Id/sdd:IBAN"/></sct:IBAN>
                             </sct:Id>
                         </sct:DbtrAcct>
+                        <sct:DbtrAgt>
+                            <sct:FinInstnId>
+                                <sct:BICFI><xsl:value-of select="sdd:DbtrAgt/sdd:FinInstnId/sdd:BICFI"/></sct:BICFI>
+                            </sct:FinInstnId>
+                        </sct:DbtrAgt>
                         <xsl:for-each select="sdd:DrctDbtTxInf">
                             <sct:CdtTrfTxInf>
                                 <sct:PmtId>
@@ -43,6 +51,11 @@
                                 <sct:Amt>
                                     <sct:InstdAmt Ccy="EUR"><xsl:value-of select="sdd:InstdAmt"/></sct:InstdAmt>
                                 </sct:Amt>
+                                <sct:CdtrAgt>
+                                    <sct:FinInstnId>
+                                        <sct:BICFI><xsl:value-of select="sdd:CdtrAgt/sdd:FinInstnId/sdd:BICFI"/></sct:BICFI>
+                                    </sct:FinInstnId>
+                                </sct:CdtrAgt>
                                 <sct:Cdtr>
                                     <sct:Nm><xsl:value-of select="sdd:Cdtr/sdd:Nm"/></sct:Nm>
                                 </sct:Cdtr>
@@ -56,8 +69,8 @@
 
                     </sct:PmtInf>
                 </xsl:for-each>
+
             </sct:CstmrCdtTrfInitn>
         </sct:Document>
     </xsl:template>
-
 </xsl:stylesheet>

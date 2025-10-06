@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:sct="urn:iso:std:iso:20022:tech:xsd:pain.001.001.03"
-    xmlns:sdd="urn:iso:std:iso:20022:tech:xsd:pain.008.001.02"
+    xmlns:sct="urn:iso:std:iso:20022:tech:xsd:pain.001.001.09"
+    xmlns:sdd="urn:iso:std:iso:20022:tech:xsd:pain.008.001.08"
     exclude-result-prefixes="sct">
 
-    <xsl:output method="xml" encoding="UTF-8" indent="yes" />
+    <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
     <xsl:template match="/">
         <sdd:Document>
-            <sdd:DrctDbtInitn>
-                <!-- Copiar GrpHdr -->
+            <sdd:CstmrDrctDbtInitn>
                 <xsl:for-each select="//sct:GrpHdr">
                     <sdd:GrpHdr>
                         <sdd:MsgId><xsl:value-of select="sct:MsgId"/></sdd:MsgId>
@@ -22,13 +21,20 @@
                         </sdd:InitgPty>
                     </sdd:GrpHdr>
                 </xsl:for-each>
-
                 <xsl:for-each select="//sct:PmtInf">
                     <sdd:PmtInf>
                         <sdd:PmtInfId><xsl:value-of select="sct:PmtInfId"/></sdd:PmtInfId>
                         <sdd:PmtMtd>DD</sdd:PmtMtd>
                         <sdd:NbOfTxs><xsl:value-of select="sct:NbOfTxs"/></sdd:NbOfTxs>
                         <sdd:CtrlSum><xsl:value-of select="sct:CtrlSum"/></sdd:CtrlSum>
+                        <sdd:ReqdColltnDt>
+                            <xsl:value-of select="sct:ReqdExctnDt"/>
+                        </sdd:ReqdColltnDt>
+                        <sdd:DbtrAgt>
+                            <sdd:FinInstnId>
+                                <sdd:BICFI><xsl:value-of select="sct:DbtrAgt/sct:FinInstnId/sct:BIC"/></sdd:BICFI>
+                            </sdd:FinInstnId>
+                        </sdd:DbtrAgt>
                         <sdd:Dbtr>
                             <sdd:Nm><xsl:value-of select="sct:Dbtr/sct:Nm"/></sdd:Nm>
                         </sdd:Dbtr>
@@ -37,13 +43,21 @@
                                 <sdd:IBAN><xsl:value-of select="sct:DbtrAcct/sct:Id/sct:IBAN"/></sdd:IBAN>
                             </sdd:Id>
                         </sdd:DbtrAcct>
-
                         <xsl:for-each select="sct:CdtTrfTxInf">
                             <sdd:DrctDbtTxInf>
                                 <sdd:PmtId>
                                     <sdd:EndToEndId><xsl:value-of select="sct:PmtId/sct:EndToEndId"/></sdd:EndToEndId>
                                 </sdd:PmtId>
-                                <sdd:InstdAmt Ccy="EUR"><xsl:value-of select="sct:Amt/sct:InstdAmt"/></sdd:InstdAmt>
+                                <sdd:InstdAmt Ccy="EUR">
+                                    <xsl:value-of select="sct:Amt/sct:InstdAmt"/>
+                                </sdd:InstdAmt>
+
+                                <sdd:CdtrAgt>
+                                    <sdd:FinInstnId>
+                                        <sdd:BICFI><xsl:value-of select="sct:CdtrAgt/sct:FinInstnId/sct:BIC"/></sdd:BICFI>
+                                    </sdd:FinInstnId>
+                                </sdd:CdtrAgt>
+
                                 <sdd:Cdtr>
                                     <sdd:Nm><xsl:value-of select="sct:Cdtr/sct:Nm"/></sdd:Nm>
                                 </sdd:Cdtr>
@@ -57,8 +71,8 @@
 
                     </sdd:PmtInf>
                 </xsl:for-each>
-            </sdd:DrctDbtInitn>
+
+            </sdd:CstmrDrctDbtInitn>
         </sdd:Document>
     </xsl:template>
-
 </xsl:stylesheet>
