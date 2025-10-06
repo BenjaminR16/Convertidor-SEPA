@@ -1,10 +1,7 @@
 package com.sstrategy.convertidor_sepa.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.sstrategy.convertidor_sepa.dto.ConversionResult;
@@ -13,6 +10,7 @@ import com.sstrategy.convertidor_sepa.service.ConversionService;
 @RestController
 @RequestMapping("/sepa")
 public class ConversionController {
+
     private final ConversionService conversionService;
 
     public ConversionController(ConversionService conversionService) {
@@ -20,12 +18,26 @@ public class ConversionController {
     }
 
     @PostMapping("/sct-to-sdd")
-    public ResponseEntity<ConversionResult> sctToSdd(@RequestParam("file") MultipartFile file) {
-        return ResponseEntity.ok(conversionService.convertSctToSdd(file));
+    public ResponseEntity<?> sctToSdd(@RequestParam("file") MultipartFile file) {
+        try {
+            ConversionResult result = conversionService.convertSctToSdd(file);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Error en conversión SCT->SDD: " + e.getMessage());
+        }
     }
 
     @PostMapping("/sdd-to-sct")
-    public ResponseEntity<ConversionResult> sddToSct(@RequestParam("file") MultipartFile file) {
-        return ResponseEntity.ok(conversionService.convertSddToSct(file));
+    public ResponseEntity<?> sddToSct(@RequestParam("file") MultipartFile file) {
+        try {
+            ConversionResult result = conversionService.convertSddToSct(file);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Error en conversión SDD->SCT: " + e.getMessage());
+        }
     }
 }
