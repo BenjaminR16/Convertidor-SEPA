@@ -1,21 +1,17 @@
 package com.sstrategy.convertidor_sepa.dto;
 
-import java.time.LocalDateTime;
-
 public class FileInfo {
     private String fileName;
     private long size;
     private String contentType;
-    private LocalDateTime uploadTime;
 
     public FileInfo() {
     }
 
-    public FileInfo(String fileName, long size, String contentType, LocalDateTime uploadTime) {
+    public FileInfo(String fileName, long size, String contentType) {
         this.fileName = fileName;
         this.size = size;
         this.contentType = contentType;
-        this.uploadTime = uploadTime;
     }
 
     public String getFileName() {
@@ -40,14 +36,6 @@ public class FileInfo {
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
-    }
-
-    public LocalDateTime getUploadTime() {
-        return uploadTime;
-    }
-
-    public void setUploadTime(LocalDateTime uploadTime) {
-        this.uploadTime = uploadTime;
     }
 
 }
