@@ -3,10 +3,12 @@ package com.sstrategy.convertidor_sepa.controller;
 import java.nio.charset.StandardCharsets;
 
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.MediaType;
 
@@ -48,8 +50,8 @@ public class ConversionController {
     }
 
     @PostMapping("/download")
-    public ResponseEntity<?> download(@RequestParam("file") MultipartFile file,
-            @RequestParam("direction") String direction) {
+    public ResponseEntity<?> download(@RequestParam MultipartFile file,
+            @RequestParam String direction) {
         try {
             if (file == null || file.isEmpty()) {
                 return ResponseEntity.badRequest().body("No se ha subido ningún archivo");
