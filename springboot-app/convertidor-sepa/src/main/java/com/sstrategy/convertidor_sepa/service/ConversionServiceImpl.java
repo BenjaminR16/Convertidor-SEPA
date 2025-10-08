@@ -24,7 +24,8 @@ public class ConversionServiceImpl implements ConversionService {
             byte[] xmlBytes = file.getBytes();
             validationService.validate(xmlBytes, "/xsd/pain.001.001.09.xsd");
             String convertedXml = XsltTransformer.transform(file, "/xslt/sct-to-sdd.xslt");
-            validationService.validate(convertedXml.getBytes(), "/xsd/pain.008.001.08.xsd");
+            validationService.validate(convertedXml.getBytes(),
+                    "/xsd/pain.008.001.08.xsd");
             FileInfo metadata = new FileInfo(file.getOriginalFilename(), file.getSize(), "SCT → SDD");
             return new ConversionResult(convertedXml, metadata);
 
