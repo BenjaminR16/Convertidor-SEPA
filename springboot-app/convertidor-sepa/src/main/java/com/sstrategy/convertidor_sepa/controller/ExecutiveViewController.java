@@ -8,7 +8,7 @@ import com.sstrategy.convertidor_sepa.dto.FileInfo;
 import com.sstrategy.convertidor_sepa.service.MetadataService;
 
 @RestController
-@RequestMapping("/executive-view")
+@RequestMapping("/api/v1/executive-view")
 public class ExecutiveViewController {
 
     private final MetadataService metadataService;

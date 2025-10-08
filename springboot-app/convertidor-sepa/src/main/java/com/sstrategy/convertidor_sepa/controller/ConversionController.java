@@ -8,7 +8,7 @@ import com.sstrategy.convertidor_sepa.dto.ConversionResult;
 import com.sstrategy.convertidor_sepa.service.ConversionService;
 
 @RestController
-@RequestMapping("/sepa")
+@RequestMapping("/api/v1/convert")
 public class ConversionController {
 
     private final ConversionService conversionService;
