@@ -2,60 +2,41 @@ package com.sstrategy.convertidor_sepa.service;
 
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
+
+import java.io.ByteArrayInputStream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.*;
-
-import java.io.ByteArrayInputStream;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 
 import com.sstrategy.convertidor_sepa.dto.FileInfo;
 
 @Service
 public class MetadataService {
-    public FileInfo extractMetadata(byte[] xmlContent, String fileName, String type) throws Exception {
-        DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+
+    public FileInfo extractBatchInfo(byte[] xmlContent) throws Exception {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        DocumentBuilder db = dbf.newDocumentBuilder();
         Document doc = db.parse(new ByteArrayInputStream(xmlContent));
 
         XPath xpath = XPathFactory.newInstance().newXPath();
 
-        String total = getXPathText(doc, xpath, "//GrpHdr/CtrlSum");
-        String currency = getXPathAttribute(doc, xpath, "//*[local-name()='InstdAmt']", "Ccy");
-        String transactions = getXPathText(doc, xpath, "//GrpHdr/NbOfTxs");
-        String creationDate = getXPathText(doc, xpath, "//GrpHdr/CreDtTm");
-        String initiatingParty = getXPathText(doc, xpath, "//GrpHdr/InitgPty/Nm");
+        String msgId = getXPathText(doc, xpath, "//*[local-name()='GrpHdr']/*[local-name()='MsgId']");
+        String fecha = getXPathText(doc, xpath, "//*[local-name()='GrpHdr']/*[local-name()='CreDtTm']");
+        String nbOfTxs = getXPathText(doc, xpath, "//*[local-name()='GrpHdr']/*[local-name()='NbOfTxs']");
+        String ctrlSum = getXPathText(doc, xpath, "//*[local-name()='GrpHdr']/*[local-name()='CtrlSum']");
+        String nomEmpresa = getXPathText(doc, xpath,
+                "//*[local-name()='GrpHdr']/*[local-name()='InitgPty']/*[local-name()='Nm']");
 
-        long size = xmlContent.length;
-
-        return new FileInfo(
-                fileName,
-                size,
-                type + " XML",
-                total,
-                currency,
-                transactions,
-                creationDate,
-                initiatingParty);
+        return new FileInfo(msgId, fecha, nbOfTxs, ctrlSum, nomEmpresa);
     }
 
-    private String getXPathText(Document doc, XPath xpath, String expression) {
+    private String getXPathText(Object context, XPath xpath, String expression) {
         try {
-            return xpath.compile(expression).evaluate(doc);
-        } catch (Exception e) {
-            return "Sin valores";
-        }
-    }
-
-    private String getXPathAttribute(Document doc, XPath xpath, String expression, String attr) {
-        try {
-            Node node = (Node) xpath.compile(expression).evaluate(doc, XPathConstants.NODE);
-            if (node != null && node.getAttributes() != null) {
-                Node attrNode = node.getAttributes().getNamedItem(attr);
-                if (attrNode != null)
-                    return attrNode.getTextContent();
-            }
-            return "Sin valores";
+            String value = xpath.compile(expression).evaluate(context);
+            return (value == null || value.isEmpty()) ? "Sin valores" : value;
         } catch (Exception e) {
             return "Sin valores";
         }
