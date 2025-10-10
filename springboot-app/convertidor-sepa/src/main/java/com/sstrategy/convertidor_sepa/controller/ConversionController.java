@@ -3,7 +3,6 @@ package com.sstrategy.convertidor_sepa.controller;
 import java.nio.charset.StandardCharsets;
 
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
