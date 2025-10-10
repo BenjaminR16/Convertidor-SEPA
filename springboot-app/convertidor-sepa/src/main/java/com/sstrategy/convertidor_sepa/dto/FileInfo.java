@@ -1,92 +1,62 @@
 package com.sstrategy.convertidor_sepa.dto;
 
 public class FileInfo {
-    private String fileName;
-    private long size;
-    private String contentType;
-    private String totalAmount;
-    private String totalTransactions;
-    private String creationDate;
-    private String initiatingParty;
-    private String currency;
+    private String msgId;
+    private String fechaCreacion;
+    private String numeroTransacciones;
+    private String sumaTotal;
+    private String nomEmpresa;
 
     public FileInfo() {
     }
 
-    public FileInfo(String fileName, long size, String contentType, String totalAmount, String totalTransactions,
-            String creationDate, String initiatingParty, String currency) {
-        this.fileName = fileName;
-        this.size = size;
-        this.contentType = contentType;
-        this.totalAmount = totalAmount;
-        this.totalTransactions = totalTransactions;
-        this.creationDate = creationDate;
-        this.initiatingParty = initiatingParty;
-        this.currency = currency;
+    public FileInfo(String msgId, String fechaCreacion, String numeroTransacciones, String sumaTotal,
+            String nomEmpresa) {
+        this.msgId = msgId;
+        this.fechaCreacion = fechaCreacion;
+        this.numeroTransacciones = numeroTransacciones;
+        this.sumaTotal = sumaTotal;
+        this.nomEmpresa = nomEmpresa;
     }
 
-    public String getFileName() {
-        return fileName;
+    public String getMsgId() {
+        return msgId;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setMsgId(String msgId) {
+        this.msgId = msgId;
     }
 
-    public long getSize() {
-        return size;
+    public String getFechaCreacion() {
+        return fechaCreacion;
     }
 
-    public void setSize(long size) {
-        this.size = size;
+    public void setFechaCreacion(String fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
     }
 
-    public String getContentType() {
-        return contentType;
+    public String getNumeroTransacciones() {
+        return numeroTransacciones;
     }
 
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
+    public void setNumeroTransacciones(String numeroTransacciones) {
+        this.numeroTransacciones = numeroTransacciones;
     }
 
-    public String getTotalAmount() {
-        return totalAmount;
+    public String getSumaTotal() {
+        return sumaTotal;
     }
 
-    public void setTotalAmount(String totalAmount) {
-        this.totalAmount = totalAmount;
+    public void setSumaTotal(String sumaTotal) {
+        this.sumaTotal = sumaTotal;
     }
 
-    public String getTotalTransactions() {
-        return totalTransactions;
+    public String getNomEmpresa() {
+        return nomEmpresa;
     }
 
-    public void setTotalTransactions(String totalTransactions) {
-        this.totalTransactions = totalTransactions;
-    }
-
-    public String getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(String creationDate) {
-        this.creationDate = creationDate;
-    }
-
-    public String getInitiatingParty() {
-        return initiatingParty;
-    }
-
-    public void setInitiatingParty(String initiatingParty) {
-        this.initiatingParty = initiatingParty;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
+    public void setNomEmpresa(String iniciador) {
+        this.nomEmpresa = iniciador;
     }
 
 }

@@ -1,6 +1,7 @@
 package com.sstrategy.convertidor_sepa.controller;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -98,22 +99,13 @@ public class ConversionController {
             } else if ("sdd-to-sct".equalsIgnoreCase(direction)) {
                 result = conversionService.convertSddToSct(file);
             } else {
-                return ResponseEntity.badRequest().body("Dirección de conversión inválida");
+                return ResponseEntity.badRequest().body("Conversión inválida");
             }
 
-            FileInfo info = metadataService.extractMetadata(
-                    result.getConvertedXml().getBytes(StandardCharsets.UTF_8),
-                    file.getOriginalFilename(),
-                    direction);
+            FileInfo batchInfo = metadataService.extractBatchInfo(
+                    result.getConvertedXml().getBytes(StandardCharsets.UTF_8));
 
-            if (info.getFileName() == null)
-                info.setFileName(file.getOriginalFilename());
-            if (info.getSize() == 0)
-                info.setSize(file.getSize());
-            if (info.getContentType() == null)
-                info.setContentType(file.getContentType());
-
-            return ResponseEntity.ok(info);
+            return ResponseEntity.ok(batchInfo);
 
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error interno: " + e.getMessage());
