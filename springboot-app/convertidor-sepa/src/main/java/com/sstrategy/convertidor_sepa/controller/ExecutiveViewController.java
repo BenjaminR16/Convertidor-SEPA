@@ -19,8 +19,8 @@ public class ExecutiveViewController {
 
     @PostMapping("/metadata")
     public ResponseEntity<?> metadata(
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("type") String type) {
+            @RequestParam MultipartFile file,
+            @RequestParam String type) {
         try {
             FileInfo info = metadataService.extractMetadata(
                     file.getBytes(),
@@ -35,7 +35,7 @@ public class ExecutiveViewController {
     }
 
     @PostMapping("/xml")
-    public ResponseEntity<?> xml(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> xml(@RequestParam MultipartFile file) {
         try {
             String xmlText = new String(file.getBytes(), "UTF-8");
             return ResponseEntity.ok(xmlText);

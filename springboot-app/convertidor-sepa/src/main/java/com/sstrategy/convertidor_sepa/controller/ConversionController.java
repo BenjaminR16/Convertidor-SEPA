@@ -5,25 +5,32 @@ import java.nio.charset.StandardCharsets;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.MediaType;
 
 import com.sstrategy.convertidor_sepa.dto.ConversionResult;
+import com.sstrategy.convertidor_sepa.dto.FileInfo;
 import com.sstrategy.convertidor_sepa.service.ConversionService;
+import com.sstrategy.convertidor_sepa.service.MetadataService;
 
 @RestController
 @RequestMapping("/api/v1/convert")
 public class ConversionController {
 
     private final ConversionService conversionService;
+    private final MetadataService metadataService;
 
-    public ConversionController(ConversionService conversionService) {
+    public ConversionController(ConversionService conversionService, MetadataService metadataService) {
         this.conversionService = conversionService;
+        this.metadataService = metadataService;
     }
 
     @PostMapping("/sct-to-sdd")
-    public ResponseEntity<?> sctToSdd(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> sctToSdd(@RequestParam MultipartFile file) {
         try {
             ConversionResult result = conversionService.convertSctToSdd(file);
             return ResponseEntity.ok(result);
@@ -35,7 +42,7 @@ public class ConversionController {
     }
 
     @PostMapping("/sdd-to-sct")
-    public ResponseEntity<?> sddToSct(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> sddToSct(@RequestParam MultipartFile file) {
         try {
             ConversionResult result = conversionService.convertSddToSct(file);
             return ResponseEntity.ok(result);
@@ -47,8 +54,8 @@ public class ConversionController {
     }
 
     @PostMapping("/download")
-    public ResponseEntity<?> download(@RequestParam("file") MultipartFile file,
-            @RequestParam("direction") String direction) {
+    public ResponseEntity<?> download(@RequestParam MultipartFile file,
+            @RequestParam String direction) {
         try {
             if (file == null || file.isEmpty()) {
                 return ResponseEntity.badRequest().body("No se ha subido ningún archivo");
@@ -75,6 +82,38 @@ public class ConversionController {
                     .contentType(MediaType.APPLICATION_XML)
                     .contentLength(xmlBytes.length)
                     .body(resource);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error interno: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/executive-view")
+    public ResponseEntity<?> viewConverted(@RequestParam MultipartFile file,
+            @RequestParam String direction) {
+        try {
+            ConversionResult result;
+            if ("sct-to-sdd".equalsIgnoreCase(direction)) {
+                result = conversionService.convertSctToSdd(file);
+            } else if ("sdd-to-sct".equalsIgnoreCase(direction)) {
+                result = conversionService.convertSddToSct(file);
+            } else {
+                return ResponseEntity.badRequest().body("Dirección de conversión inválida");
+            }
+
+            FileInfo info = metadataService.extractMetadata(
+                    result.getConvertedXml().getBytes(StandardCharsets.UTF_8),
+                    file.getOriginalFilename(),
+                    direction);
+
+            if (info.getFileName() == null)
+                info.setFileName(file.getOriginalFilename());
+            if (info.getSize() == 0)
+                info.setSize(file.getSize());
+            if (info.getContentType() == null)
+                info.setContentType(file.getContentType());
+
+            return ResponseEntity.ok(info);
 
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error interno: " + e.getMessage());
