@@ -15,7 +15,7 @@ import com.sstrategy.convertidor_sepa.dto.FileInfo;
 @Service
 public class MetadataService {
 
-    public FileInfo extractBatchInfo(byte[] xmlContent) throws Exception {
+    public FileInfo extractMetaInfo(byte[] xmlContent) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         DocumentBuilder db = dbf.newDocumentBuilder();

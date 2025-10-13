@@ -1,7 +1,6 @@
 package com.sstrategy.convertidor_sepa.controller;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -102,10 +101,10 @@ public class ConversionController {
                 return ResponseEntity.badRequest().body("Conversión inválida");
             }
 
-            FileInfo batchInfo = metadataService.extractBatchInfo(
+            FileInfo metaInfo = metadataService.extractMetaInfo(
                     result.getConvertedXml().getBytes(StandardCharsets.UTF_8));
 
-            return ResponseEntity.ok(batchInfo);
+            return ResponseEntity.ok(metaInfo);
 
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error interno: " + e.getMessage());
