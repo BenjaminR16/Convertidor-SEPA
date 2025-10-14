@@ -1,4 +1,4 @@
-<div class="max-w-4xl mx-auto">
+<div class="max-w-4xl mx-auto mt-8 md:mt-12">
 
 
   <input #fileInput id="sepaFile" type="file" accept=".xml" class="hidden" aria-hidden="true" (change)="onFileInputChange($event)" />
@@ -50,6 +50,10 @@
     </div>
   </label>
 
+  @if (selectedFile()) {
+<app-file-view [xmlRaw]="xmlRaw()"></app-file-view>
+}
+
   <div class="mt-6">
     <h4 class="text-lg font-medium text-gray-900 mb-6 text-center">
       Formatos Soportados
@@ -57,7 +61,7 @@
 
     <div class="grid md:grid-cols-2 gap-6">
       <div class="card hover:shadow-xl transition-shadow duration-300">
-        <div class="card-body border-1 rounded-2xl bg-gradient-to-r from-blue-50 via-purple-50 to-blue-100">
+        <div class="card-body border-1 rounded-2xl bg-gradient-to-r from-blue-100 via-purple-50 to-blue-100">
           <div class="flex items-center space-x-4">
             <div class="flex-shrink-0 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 rounded-2xl">
               <span class="badge-sct text-lg text-white font-bold px-4 py-2 ">
@@ -80,7 +84,7 @@
       </div>
 
       <div class="card hover:shadow-xl transition-shadow duration-300">
-        <div class="card-body border-1 rounded-2xl bg-gradient-to-r from-blue-50 via-purple-50 to-blue-100">
+        <div class="card-body border-1 rounded-2xl bg-gradient-to-r from-blue-100 via-purple-50 to-blue-100">
           <div class="flex items-center space-x-4">
             <div class="flex-shrink-0 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 rounded-2xl">
               <span class="badge-sdd text-lg text-white font-bold px-4 py-2 ">
@@ -104,3 +108,4 @@
     </div>
   </div >
 </div>
+
