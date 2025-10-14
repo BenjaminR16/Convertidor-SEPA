@@ -29,27 +29,26 @@ public class ConversionController {
         this.metadataService = metadataService;
     }
 
-    @PostMapping("/sct-to-sdd")
-    public ResponseEntity<?> sctToSdd(@RequestParam MultipartFile file) {
-        try {
-            ConversionResult result = conversionService.convertSctToSdd(file);
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Error en conversión SCT->SDD: " + e.getMessage());
+    private ConversionResult convertFile(MultipartFile file, String direction) throws Exception {
+        if ("sct-to-sdd".equalsIgnoreCase(direction)) {
+            return conversionService.convertSctToSdd(file);
+        } else if ("sdd-to-sct".equalsIgnoreCase(direction)) {
+            return conversionService.convertSddToSct(file);
+        } else {
+            throw new IllegalArgumentException("Dirección de conversión inválida");
         }
     }
 
-    @PostMapping("/sdd-to-sct")
-    public ResponseEntity<?> sddToSct(@RequestParam MultipartFile file) {
+    @PostMapping
+    public ResponseEntity<?> convert(@RequestParam MultipartFile file,
+            @RequestParam String direction) {
         try {
-            ConversionResult result = conversionService.convertSddToSct(file);
+            ConversionResult result = convertFile(file, direction);
             return ResponseEntity.ok(result);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Error en conversión SDD->SCT: " + e.getMessage());
+            return ResponseEntity.status(500).body("Error en conversión: " + e.getMessage());
         }
     }
 
@@ -57,21 +56,9 @@ public class ConversionController {
     public ResponseEntity<?> download(@RequestParam MultipartFile file,
             @RequestParam String direction) {
         try {
-            if (file == null || file.isEmpty()) {
-                return ResponseEntity.badRequest().body("No se ha subido ningún archivo");
-            }
+            ConversionResult result = convertFile(file, direction);
 
-            ConversionResult result;
-            if ("sct-to-sdd".equalsIgnoreCase(direction)) {
-                result = conversionService.convertSctToSdd(file);
-            } else if ("sdd-to-sct".equalsIgnoreCase(direction)) {
-                result = conversionService.convertSddToSct(file);
-            } else {
-                return ResponseEntity.badRequest().body("Dirección de conversión inválida");
-            }
-
-            String xmlContent = result.getConvertedXml() != null ? result.getConvertedXml() : "";
-            byte[] xmlBytes = xmlContent.getBytes(StandardCharsets.UTF_8);
+            byte[] xmlBytes = result.getConvertedXml().getBytes(StandardCharsets.UTF_8);
             ByteArrayResource resource = new ByteArrayResource(xmlBytes);
 
             String originalName = file.getOriginalFilename() != null ? file.getOriginalFilename() : "file.xml";
@@ -82,7 +69,6 @@ public class ConversionController {
                     .contentType(MediaType.APPLICATION_XML)
                     .contentLength(xmlBytes.length)
                     .body(resource);
-
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error interno: " + e.getMessage());
         }
@@ -92,20 +78,12 @@ public class ConversionController {
     public ResponseEntity<?> viewConverted(@RequestParam MultipartFile file,
             @RequestParam String direction) {
         try {
-            ConversionResult result;
-            if ("sct-to-sdd".equalsIgnoreCase(direction)) {
-                result = conversionService.convertSctToSdd(file);
-            } else if ("sdd-to-sct".equalsIgnoreCase(direction)) {
-                result = conversionService.convertSddToSct(file);
-            } else {
-                return ResponseEntity.badRequest().body("Conversión inválida");
-            }
+            ConversionResult result = convertFile(file, direction);
 
             FileInfo metaInfo = metadataService.extractMetaInfo(
                     result.getConvertedXml().getBytes(StandardCharsets.UTF_8));
 
             return ResponseEntity.ok(metaInfo);
-
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error interno: " + e.getMessage());
         }
