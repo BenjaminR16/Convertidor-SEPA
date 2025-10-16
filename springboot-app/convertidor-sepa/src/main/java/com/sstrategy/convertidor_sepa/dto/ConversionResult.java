@@ -1,14 +1,12 @@
 package com.sstrategy.convertidor_sepa.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ConversionResult {
     private String convertedXml;
-
-    public ConversionResult(String convertedXml) {
-        this.convertedXml = convertedXml;
-    }
-
-    public String getConvertedXml() {
-        return convertedXml;
-    }
-
 }
