@@ -13,6 +13,7 @@ export class FileUploadComponent {
   protected readonly selectedFile = signal<File | null>(null);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly xmlRaw = signal<string | null>(null);
+  protected readonly isConverted = signal(false);
 
   //Cambio de input desde el selector de archivos
   onFileInputChange(event: Event): void {
@@ -97,9 +98,17 @@ export class FileUploadComponent {
     event.stopPropagation();
   }
 
+  // --- BOTÓN CONVERTIR ---
+  convertFile(): void {
+    // Aquí más adelante llamaremos al backend para convertir de verdad
+    this.isConverted.set(true);
+  }
 
-
-
-
-
+  // --- BOTÓN VOLVER ---
+  goBack(): void {
+    this.isConverted.set(false);
+    this.selectedFile.set(null);
+    this.xmlRaw.set(null);
+    this.errorMessage.set(null);
+  }
 }
