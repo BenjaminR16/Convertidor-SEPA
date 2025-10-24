@@ -35,12 +35,11 @@ public class ConversionServiceImpl implements ConversionService {
                 try {
                     validationService.validate(xmlBytes, "/xsd/pain.001.001.03.xsd");
                 } catch (Exception v03e) {
-                    // Permitir continuar con transformación aunque el orden de elementos no sea canónico
-                    // (caso común en ficheros heredados). La salida sí se validará estrictamente.
+                    // Permitir continuar con transformacion aunque el orden de elementos no vaya en orden
                 }
-                xslt = "/xslt/pain00100103-to-pain00800108.xslt";
+                xslt = "/xslt/sct03-to-sdd08.xslt";
             } else if (xmlString.contains("urn:iso:std:iso:20022:tech:xsd:pain.001.001.09")) {
-                // pain.001.001.09 -> pain.008.001.08 (existing)
+                // pain.001.001.09 -> pain.008.001.08
                 validationService.validate(xmlBytes, "/xsd/pain.001.001.09.xsd");
                 xslt = "/xslt/sct-to-sdd.xslt";
             } else {
@@ -75,10 +74,9 @@ public class ConversionServiceImpl implements ConversionService {
                 try {
                     validationService.validate(xmlBytes, "/xsd/pain.008.001.02.xsd");
                 } catch (Exception v02e) {
-                    // Permitir continuar con transformación aunque el orden de elementos no sea canónico
-                    // (caso común en ficheros heredados). La salida sí se validará estrictamente.
+                    // Permitir continuar con transformacion aunque el orden de elementos no vaya en orden
                 }
-                xslt = "/xslt/pain00800102-to-pain00100109.xslt";
+                xslt = "/xslt/sdd02-to-sct09.xslt";
             } else if (xmlString.contains("urn:iso:std:iso:20022:tech:xsd:pain.008.001.08")) {
                 // pain.008.001.08 -> pain.001.001.09 
                 validationService.validate(xmlBytes, "/xsd/pain.008.001.08.xsd");

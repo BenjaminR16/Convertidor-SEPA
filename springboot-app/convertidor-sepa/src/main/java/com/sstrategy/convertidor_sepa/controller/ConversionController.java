@@ -31,7 +31,21 @@ public class ConversionController {
     }
 
     private ConversionResult convertFile(MultipartFile file, String direction) throws Exception {
-        if ("sct-to-sdd".equalsIgnoreCase(direction)) {
+        String normalized = direction != null ? direction.trim().toLowerCase() : null;
+
+        if (normalized == null || normalized.isEmpty() || "auto".equals(normalized)) {
+            // Detectar dirección basándose en el namespace del XML
+            String xml = new String(file.getBytes(), StandardCharsets.UTF_8).toLowerCase();
+            if (xml.contains("urn:iso:std:iso:20022:tech:xsd:pain.001")) {
+                normalized = "sct-to-sdd";
+            } else if (xml.contains("urn:iso:std:iso:20022:tech:xsd:pain.008")) {
+                normalized = "sdd-to-sct";
+            } else {
+                throw new IllegalArgumentException("No se pudo detectar el tipo del archivo (SCT/SDD). Especifique 'direction'.");
+            }
+        }
+
+        if ("sct-to-sdd".equalsIgnoreCase(normalized)) {
             return conversionService.convertSctToSdd(file);
         } else if ("sdd-to-sct".equalsIgnoreCase(normalized)) {
             return conversionService.convertSddToSct(file);
@@ -42,7 +56,7 @@ public class ConversionController {
 
     @PostMapping
     public ResponseEntity<?> convert(@RequestParam MultipartFile file,
-            @RequestParam String direction) {
+        @RequestParam(required = false) String direction) {
         try {
             ConversionResult result = convertFile(file, direction);
             return ResponseEntity.ok(result);
@@ -55,33 +69,43 @@ public class ConversionController {
 
     @PostMapping("/download")
     public ResponseEntity<?> download(@RequestParam MultipartFile file,
-            @RequestParam String direction) {
+        @RequestParam(required = false) String direction) {
         try {
             ConversionResult result = convertFile(file, direction);
 
-        byte[] xmlBytes = result.getConvertedXml().getBytes(StandardCharsets.UTF_8);
-        ByteArrayResource resource = new ByteArrayResource(xmlBytes);
+            byte[] xmlBytes = result.getConvertedXml().getBytes(StandardCharsets.UTF_8);
+            ByteArrayResource resource = new ByteArrayResource(xmlBytes);
 
-        String originalName = file.getOriginalFilename() != null ? file.getOriginalFilename() : "file.xml";
-        String filename = "converted_" + originalName;
+            String originalName = file.getOriginalFilename() != null ? file.getOriginalFilename() : "file.xml";
+            String filename = "converted_" + originalName;
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
-                .contentType(MediaType.APPLICATION_XML)
-                .contentLength(xmlBytes.length)
-                .body(resource);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                    .contentType(MediaType.APPLICATION_XML)
+                    .contentLength(xmlBytes.length)
+                    .body(resource);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error interno: " + e.getMessage());
+        }
     }
 
     @PostMapping("/executive-view")
     public ResponseEntity<?> viewConverted(@RequestParam MultipartFile file,
-            @RequestParam String direction) {
+        @RequestParam(required = false) String direction) {
         try {
             ConversionResult result = convertFile(file, direction);
 
-        FileInfo metaInfo = metadataService.extractMetaInfo(
-                result.getConvertedXml().getBytes(StandardCharsets.UTF_8));
+            FileInfo metaInfo = metadataService.extractMetaInfo(
+                    result.getConvertedXml().getBytes(StandardCharsets.UTF_8));
 
-        return ResponseEntity.ok(metaInfo);
+            return ResponseEntity.ok(metaInfo);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error interno: " + e.getMessage());
+        }
     }
 
 }

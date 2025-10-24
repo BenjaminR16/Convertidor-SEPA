@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:sdd="urn:iso:std:iso:20022:tech:xsd:pain.008.001.08"
+    xmlns:sdd="urn:iso:std:iso:20022:tech:xsd:pain.008.001.02"
     xmlns:sct="urn:iso:std:iso:20022:tech:xsd:pain.001.001.09"
     exclude-result-prefixes="sdd"
     version="1.0">
@@ -55,18 +55,9 @@
                 </sct:SvcLvl>
             </sct:PmtTpInf>
             <sct:ReqdExctnDt>
-                <xsl:choose>
-                    <xsl:when test="contains(sdd:ReqdColltnDt, 'T')">
-                        <sct:DtTm>
-                            <xsl:value-of select="sdd:ReqdColltnDt" />
-                        </sct:DtTm>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <sct:Dt>
-                            <xsl:value-of select="sdd:ReqdColltnDt" />
-                        </sct:Dt>
-                    </xsl:otherwise>
-                </xsl:choose>
+                <sct:Dt>
+                    <xsl:value-of select="sdd:ReqdColltnDt" />
+                </sct:Dt>
             </sct:ReqdExctnDt>
             <sct:Dbtr>
                 <sct:Nm>
@@ -85,9 +76,9 @@
             <sct:DbtrAgt>
                 <sct:FinInstnId>
                     <xsl:choose>
-                        <xsl:when test="sdd:CdtrAgt/sdd:FinInstnId/sdd:BICFI">
+                        <xsl:when test="sdd:CdtrAgt/sdd:FinInstnId/sdd:BIC">
                             <sct:BICFI>
-                                <xsl:value-of select="sdd:CdtrAgt/sdd:FinInstnId/sdd:BICFI" />
+                                <xsl:value-of select="sdd:CdtrAgt/sdd:FinInstnId/sdd:BIC" />
                             </sct:BICFI>
                         </xsl:when>
                         <xsl:when test="sdd:CdtrAgt/sdd:FinInstnId/sdd:Othr/sdd:Id">
@@ -120,9 +111,9 @@
                     <sct:CdtrAgt>
                         <sct:FinInstnId>
                             <xsl:choose>
-                                <xsl:when test="sdd:DbtrAgt/sdd:FinInstnId/sdd:BICFI">
+                                <xsl:when test="sdd:DbtrAgt/sdd:FinInstnId/sdd:BIC">
                                     <sct:BICFI>
-                                        <xsl:value-of select="sdd:DbtrAgt/sdd:FinInstnId/sdd:BICFI" />
+                                        <xsl:value-of select="sdd:DbtrAgt/sdd:FinInstnId/sdd:BIC" />
                                     </sct:BICFI>
                                 </xsl:when>
                                 <xsl:when test="sdd:DbtrAgt/sdd:FinInstnId/sdd:Othr/sdd:Id">
