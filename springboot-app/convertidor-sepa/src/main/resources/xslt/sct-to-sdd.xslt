@@ -89,17 +89,31 @@
                                 </sdd:IBAN>
                             </sdd:Id>
                         </sdd:CdtrAcct>
-                        <xsl:if
-                            test="sct:DbtrAgt/sct:FinInstnId/sct:BICFI or sct:CdtTrfTxInf[1]/sct:DbtrAgt/sct:FinInstnId/sct:BICFI">
-                            <sdd:CdtrAgt>
-                                <sdd:FinInstnId>
-                                    <sdd:BICFI>
-                                        <xsl:value-of
-                                            select="sct:DbtrAgt/sct:FinInstnId/sct:BICFI | sct:CdtTrfTxInf[1]/sct:DbtrAgt/sct:FinInstnId/sct:BICFI" />
-                                    </sdd:BICFI>
-                                </sdd:FinInstnId>
-                            </sdd:CdtrAgt>
-                        </xsl:if>
+                        <!-- CdtrAgt requerido en pain.008.001.08: generar siempre con fallback -->
+                        <sdd:CdtrAgt>
+                            <sdd:FinInstnId>
+                                <xsl:choose>
+                                    <xsl:when test="sct:DbtrAgt/sct:FinInstnId/sct:BICFI or sct:CdtTrfTxInf[1]/sct:DbtrAgt/sct:FinInstnId/sct:BICFI">
+                                        <sdd:BICFI>
+                                            <xsl:value-of
+                                                select="sct:DbtrAgt/sct:FinInstnId/sct:BICFI | sct:CdtTrfTxInf[1]/sct:DbtrAgt/sct:FinInstnId/sct:BICFI" />
+                                        </sdd:BICFI>
+                                    </xsl:when>
+                                    <xsl:when test="sct:DbtrAgt/sct:FinInstnId/sct:Othr/sct:Id or sct:CdtTrfTxInf[1]/sct:DbtrAgt/sct:FinInstnId/sct:Othr/sct:Id">
+                                        <sdd:Othr>
+                                            <sdd:Id>
+                                                <xsl:value-of select="sct:DbtrAgt/sct:FinInstnId/sct:Othr/sct:Id | sct:CdtTrfTxInf[1]/sct:DbtrAgt/sct:FinInstnId/sct:Othr/sct:Id" />
+                                            </sdd:Id>
+                                        </sdd:Othr>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <sdd:Othr>
+                                            <sdd:Id>NOTPROVIDED</sdd:Id>
+                                        </sdd:Othr>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </sdd:FinInstnId>
+                        </sdd:CdtrAgt>
                         <xsl:for-each select="sct:CdtTrfTxInf">
                             <sdd:DrctDbtTxInf>
                                 <sdd:PmtId>
@@ -137,16 +151,30 @@
                                         </sdd:Nm>
                                     </sdd:UltmtCdtr>
                                 </xsl:if>
-                                <xsl:if test="sct:CdtrAgt/sct:FinInstnId/sct:BICFI">
-                                    <sdd:DbtrAgt>
-                                        <sdd:FinInstnId>
-                                            <sdd:BICFI>
-                                                <xsl:value-of
-                                                    select="sct:CdtrAgt/sct:FinInstnId/sct:BICFI" />
-                                            </sdd:BICFI>
-                                        </sdd:FinInstnId>
-                                    </sdd:DbtrAgt>
-                                </xsl:if>
+                                <!-- DbtrAgt obligatorio en la secuencia antes de Dbtr; generar siempre con fallback -->
+                                <sdd:DbtrAgt>
+                                    <sdd:FinInstnId>
+                                        <xsl:choose>
+                                            <xsl:when test="sct:CdtrAgt/sct:FinInstnId/sct:BICFI">
+                                                    <sdd:BICFI>
+                                                        <xsl:value-of select="sct:CdtrAgt/sct:FinInstnId/sct:BICFI" />
+                                                    </sdd:BICFI>
+                                            </xsl:when>
+                                            <xsl:when test="sct:CdtrAgt/sct:FinInstnId/sct:Othr/sct:Id">
+                                                <sdd:Othr>
+                                                    <sdd:Id>
+                                                        <xsl:value-of select="sct:CdtrAgt/sct:FinInstnId/sct:Othr/sct:Id" />
+                                                    </sdd:Id>
+                                                </sdd:Othr>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <sdd:Othr>
+                                                    <sdd:Id>NOTPROVIDED</sdd:Id>
+                                                </sdd:Othr>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </sdd:FinInstnId>
+                                </sdd:DbtrAgt>
                                 <sdd:Dbtr>
                                     <sdd:Nm>
                                         <xsl:value-of select="sct:Cdtr/sct:Nm | ../sct:Cdtr/sct:Nm" />

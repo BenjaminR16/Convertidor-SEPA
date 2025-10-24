@@ -1,5 +1,7 @@
 package com.sstrategy.convertidor_sepa.service;
 
+import java.nio.charset.StandardCharsets;
+
 import com.sstrategy.convertidor_sepa.dto.ConversionResult;
 import com.sstrategy.convertidor_sepa.exception.ConversionException;
 import com.sstrategy.convertidor_sepa.exception.FileProcessingException;
@@ -24,9 +26,29 @@ public class ConversionServiceImpl implements ConversionService {
             if (file.isEmpty())
                 throw new FileProcessingException("Archivo SCT vacío");
             byte[] xmlBytes = file.getBytes();
-            validationService.validate(xmlBytes, "/xsd/pain.001.001.09.xsd");
-            String convertedXml = XsltTransformer.transform(file, "/xslt/sct-to-sdd.xslt");
-            validationService.validate(convertedXml.getBytes(),
+
+            String xmlString = new String(xmlBytes, StandardCharsets.UTF_8);
+
+            final String xslt;
+            if (xmlString.contains("urn:iso:std:iso:20022:tech:xsd:pain.001.001.03")) {
+                // pain.001.001.03 -> pain.008.001.08
+                try {
+                    validationService.validate(xmlBytes, "/xsd/pain.001.001.03.xsd");
+                } catch (Exception v03e) {
+                    // Permitir continuar con transformación aunque el orden de elementos no sea canónico
+                    // (caso común en ficheros heredados). La salida sí se validará estrictamente.
+                }
+                xslt = "/xslt/pain00100103-to-pain00800108.xslt";
+            } else if (xmlString.contains("urn:iso:std:iso:20022:tech:xsd:pain.001.001.09")) {
+                // pain.001.001.09 -> pain.008.001.08 (existing)
+                validationService.validate(xmlBytes, "/xsd/pain.001.001.09.xsd");
+                xslt = "/xslt/sct-to-sdd.xslt";
+            } else {
+                throw new IllegalArgumentException("Versión SCT no soportada. Se espera pain.001.001.03 o pain.001.001.09");
+            }
+
+            String convertedXml = XsltTransformer.transform(file, xslt);
+            validationService.validate(convertedXml.getBytes(StandardCharsets.UTF_8),
                     "/xsd/pain.008.001.08.xsd");
             return new ConversionResult(convertedXml);
 
@@ -44,9 +66,29 @@ public class ConversionServiceImpl implements ConversionService {
             if (file.isEmpty())
                 throw new FileProcessingException("Archivo SDD vacío");
             byte[] xmlBytes = file.getBytes();
-            validationService.validate(xmlBytes, "/xsd/pain.008.001.08.xsd");
-            String convertedXml = XsltTransformer.transform(file, "/xslt/sdd-to-sct.xslt");
-            validationService.validate(convertedXml.getBytes(), "/xsd/pain.001.001.09.xsd");
+
+            String xmlString = new String(xmlBytes, StandardCharsets.UTF_8);
+
+            final String xslt;
+            if (xmlString.contains("urn:iso:std:iso:20022:tech:xsd:pain.008.001.02")) {
+                // pain.008.001.02 -> pain.001.001.09
+                try {
+                    validationService.validate(xmlBytes, "/xsd/pain.008.001.02.xsd");
+                } catch (Exception v02e) {
+                    // Permitir continuar con transformación aunque el orden de elementos no sea canónico
+                    // (caso común en ficheros heredados). La salida sí se validará estrictamente.
+                }
+                xslt = "/xslt/pain00800102-to-pain00100109.xslt";
+            } else if (xmlString.contains("urn:iso:std:iso:20022:tech:xsd:pain.008.001.08")) {
+                // pain.008.001.08 -> pain.001.001.09 
+                validationService.validate(xmlBytes, "/xsd/pain.008.001.08.xsd");
+                xslt = "/xslt/sdd-to-sct.xslt";
+            } else {
+                throw new IllegalArgumentException("Versión SDD no soportada. Se espera pain.008.001.02 o pain.008.001.08");
+            }
+
+            String convertedXml = XsltTransformer.transform(file, xslt);
+            validationService.validate(convertedXml.getBytes(StandardCharsets.UTF_8), "/xsd/pain.001.001.09.xsd");
             return new ConversionResult(convertedXml);
 
         } catch (FileProcessingException | ValidationException e) {

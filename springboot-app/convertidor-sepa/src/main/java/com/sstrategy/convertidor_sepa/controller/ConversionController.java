@@ -30,10 +30,10 @@ public class ConversionController {
         this.metadataService = metadataService;
     }
 
-    private ConversionResult convertFile(MultipartFile file, String direction) {
+    private ConversionResult convertFile(MultipartFile file, String direction) throws Exception {
         if ("sct-to-sdd".equalsIgnoreCase(direction)) {
             return conversionService.convertSctToSdd(file);
-        } else if ("sdd-to-sct".equalsIgnoreCase(direction)) {
+        } else if ("sdd-to-sct".equalsIgnoreCase(normalized)) {
             return conversionService.convertSddToSct(file);
         } else {
             throw new InvalidConversionDirectionException("Dirección de conversión inválida: " + direction + ". Valores permitidos: sct-to-sdd, sdd-to-sct");
@@ -43,14 +43,21 @@ public class ConversionController {
     @PostMapping
     public ResponseEntity<?> convert(@RequestParam MultipartFile file,
             @RequestParam String direction) {
-        ConversionResult result = convertFile(file, direction);
-        return ResponseEntity.ok(result);
+        try {
+            ConversionResult result = convertFile(file, direction);
+            return ResponseEntity.ok(result);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error en conversión: " + e.getMessage());
+        }
     }
 
     @PostMapping("/download")
     public ResponseEntity<?> download(@RequestParam MultipartFile file,
             @RequestParam String direction) {
-        ConversionResult result = convertFile(file, direction);
+        try {
+            ConversionResult result = convertFile(file, direction);
 
         byte[] xmlBytes = result.getConvertedXml().getBytes(StandardCharsets.UTF_8);
         ByteArrayResource resource = new ByteArrayResource(xmlBytes);
@@ -68,7 +75,8 @@ public class ConversionController {
     @PostMapping("/executive-view")
     public ResponseEntity<?> viewConverted(@RequestParam MultipartFile file,
             @RequestParam String direction) {
-        ConversionResult result = convertFile(file, direction);
+        try {
+            ConversionResult result = convertFile(file, direction);
 
         FileInfo metaInfo = metadataService.extractMetaInfo(
                 result.getConvertedXml().getBytes(StandardCharsets.UTF_8));
