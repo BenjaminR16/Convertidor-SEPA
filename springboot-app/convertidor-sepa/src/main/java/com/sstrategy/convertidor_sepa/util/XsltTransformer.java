@@ -8,13 +8,16 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 
+import com.sstrategy.convertidor_sepa.exception.ConversionException;
+import com.sstrategy.convertidor_sepa.exception.FileProcessingException;
+
 public class XsltTransformer {
 
-    public static String transform(MultipartFile xmlFile, String xsltPath) throws Exception {
+    public static String transform(MultipartFile xmlFile, String xsltPath) throws ConversionException {
         try (InputStream xsltStream = XsltTransformer.class.getResourceAsStream(xsltPath)) {
 
             if (xsltStream == null) {
-                throw new IllegalArgumentException("No se encuentra el XSLT: " + xsltPath);
+                throw new FileProcessingException("No se encuentra el XSLT: " + xsltPath);
             }
 
             TransformerFactory factory = TransformerFactory.newInstance();
@@ -27,8 +30,12 @@ public class XsltTransformer {
 
             return writer.toString();
 
+        } catch (FileProcessingException e) {
+            throw e;
         } catch (TransformerException te) {
-            throw new Exception("Error aplicando XSLT: " + te.getMessage(), te);
+            throw new ConversionException("Error aplicando XSLT: " + te.getMessage(), te);
+        } catch (Exception e) {
+            throw new ConversionException("Error inesperado en transformación XSLT: " + e.getMessage(), e);
         }
     }
 }
