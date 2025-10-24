@@ -20,7 +20,6 @@ export class FileUploadComponent {
     const input = event.target as HTMLInputElement;
     if (input?.files && input.files.length > 0) {
       this.handleFiles(input.files);
-      // Permitir seleccionar el mismo archivo nuevamente limpiando el valor
       input.value = '';
     }
   }
