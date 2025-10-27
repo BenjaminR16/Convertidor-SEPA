@@ -49,12 +49,12 @@
       </div>
 
       <!-- Botones principales -->
-      <div class="card-actions mt-6 flex flex-col gap-3">
-        <button type="button" class="btn btn-primary" (click)="fileInput.click()">
+      <div class="card-actions mt-6 flex flex-col gap-3 ">
+        <button type="button" class="btn btn-primary w-full" (click)="fileInput.click()">
           Seleccionar archivo
         </button>
         @if (selectedFile()) {
-        <button type="button" class="btn btn-secondary" (click)="convertFile()">
+        <button type="button" class="btn btn-secondary w-full" (click)="convertFile()">
           Convertir archivo
         </button>
         }
@@ -115,9 +115,7 @@
     </div>
   </div>
 
-  } <!-- cierre de @if (!isConverted()) -->
-
-
+  }
   <!-- VISTA 2: VISOR -->
   @if (isConverted()) {
 
@@ -128,7 +126,13 @@
     </button>
 
     <!-- Visor -->
-    <app-file-view [xmlRaw]="xmlRaw()"></app-file-view>
+    <app-file-view [originalInfo]="originalInfo()" [convertedInfo]="convertedInfo()"></app-file-view>
+
+    <div class="flex justify-center items-center mt-10">
+      <button type="button" class="btn btn-outline btn-secondary mb-6">
+        Descargar
+      </button>
+    </div>
   </div>
 
   }
