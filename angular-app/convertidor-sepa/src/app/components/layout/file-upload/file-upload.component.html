@@ -49,12 +49,12 @@
       </div>
 
       <!-- Botones principales -->
-      <div class="card-actions mt-6 flex flex-col gap-3">
-        <button type="button" class="btn btn-primary" (click)="fileInput.click()">
+      <div class="card-actions mt-6 flex  flex-col gap-3">
+        <button type="button" class="btn btn-primary w-full" (click)="fileInput.click()">
           Seleccionar archivo
         </button>
         @if (selectedFile()) {
-        <button type="button" class="btn btn-secondary" (click)="convertFile()">
+        <button type="button" class="btn btn-secondary w-full" (click)="convertFile()">
           Convertir archivo
         </button>
         }
@@ -68,23 +68,23 @@
       Formatos Soportados
     </h4>
 
-    <div class="grid md:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
       <!-- Tarjeta SCT -->
       <div class="card hover:shadow-xl transition-shadow duration-300">
-        <div class="card-body border-1 rounded-2xl bg-gradient-to-r from-blue-100 via-purple-50 to-blue-100">
+        <div class="card-body border rounded-2xl bg-gradient-to-r from-blue-100 via-purple-50 to-blue-100">
           <div class="flex items-center space-x-4">
             <div class="flex-shrink-0 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 rounded-2xl">
-              <span class="badge-sct text-lg text-white font-bold px-4 py-2">
-                SCT
+              <span class="badge-sdd text-lg text-white font-bold px-4 py-2">
+                SDD
               </span>
             </div>
             <div>
               <h5 class="font-semibold text-gray-900 mb-1">
-                SEPA Credit Transfer (pain.001)
+                SEPA Direct Debit (pain.008)
               </h5>
-              <p class="text-sm text-gray-600">Transferencias y pagos</p>
+              <p class="text-sm text-gray-600">Adeudos y domiciliaciones</p>
               <p class="text-xs text-gray-500 mt-1">
-                ISO 20022 - pain.001.001.09
+                ISO 20022 - pain.008.001.08
               </p>
             </div>
           </div>
@@ -93,7 +93,7 @@
 
       <!-- Tarjeta SDD -->
       <div class="card hover:shadow-xl transition-shadow duration-300">
-        <div class="card-body border-1 rounded-2xl bg-gradient-to-r from-blue-100 via-purple-50 to-blue-100">
+        <div class="card-body border rounded-2xl bg-gradient-to-r from-blue-100 via-purple-50 to-blue-100">
           <div class="flex items-center space-x-4">
             <div class="flex-shrink-0 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 rounded-2xl">
               <span class="badge-sdd text-lg text-white font-bold px-4 py-2">
@@ -128,7 +128,8 @@
     </button>
 
     <!-- Visor -->
-    <app-file-view [xmlRaw]="xmlRaw()"></app-file-view>
+    <app-file-view [xmlRaw]="xmlRaw()" [xmlConverted]="xmlConverted()"></app-file-view>
+
   </div>
 
   }

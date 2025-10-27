@@ -1,12 +1,15 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, Input } from '@angular/core';
+import { FileInfo } from '../interfaces/file-info.model';
 
 @Component({
   selector: 'app-file-view',
-  imports: [],
   templateUrl: './file-view.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FileViewComponent {
-  // XML a mostrar: el padre lo pasa como string y aquí se expone como Signal
   xmlRaw = input<string | null>(null);
- }
+
+  // XML convertido (nuevo)
+  xmlConverted = input<string | null>(null);
+}
+
