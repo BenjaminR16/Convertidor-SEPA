@@ -2,7 +2,12 @@ import { ChangeDetectionStrategy, Component, HostListener, signal } from '@angul
 import { FileViewComponent } from "../file-view/file-view.component";
 import { ConversionService } from '../service/conversion.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FileInfo } from '../interfaces/file-info.model';
+
+// Definimos la interfaz que coincide con tu DTO ConversionResult
+interface ConversionResult {
+  convertedXml: string;
+  // agrega otros campos si tu backend devuelve más
+}
 
 @Component({
   selector: 'app-file-upload',
@@ -15,13 +20,14 @@ export class FileUploadComponent {
   protected readonly isDragOver = signal(false);
   protected readonly selectedFile = signal<File | null>(null);
   protected readonly errorMessage = signal<string | null>(null);
+  protected readonly xmlRaw = signal<string | null>(null);
   protected readonly isConverted = signal(false);
   protected readonly isLoading = signal(false);
-  protected readonly originalInfo = signal<FileInfo | null>(null);
-  protected readonly convertedInfo = signal<FileInfo | null>(null);
+  protected readonly xmlConverted = signal<string | null>(null);
 
   constructor(private conversionService: ConversionService) { }
 
+  // --- Manejo de input y drag & drop ---
   onFileInputChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input?.files && input.files.length > 0) {
@@ -30,8 +36,16 @@ export class FileUploadComponent {
     }
   }
 
-  onDragOver(event: DragEvent): void { this.preventDefaults(event); this.isDragOver.set(true); }
-  onDragLeave(event: DragEvent): void { this.preventDefaults(event); this.isDragOver.set(false); }
+  onDragOver(event: DragEvent): void {
+    this.preventDefaults(event);
+    this.isDragOver.set(true);
+  }
+
+  onDragLeave(event: DragEvent): void {
+    this.preventDefaults(event);
+    this.isDragOver.set(false);
+  }
+
   onDrop(event: DragEvent): void {
     this.preventDefaults(event);
     this.isDragOver.set(false);
@@ -61,20 +75,27 @@ export class FileUploadComponent {
       this.errorMessage.set('Solo se permiten archivos XML (.xml)');
       return;
     }
+
     if (file.size > maxBytes) {
       this.selectedFile.set(null);
       this.errorMessage.set('El archivo excede el tamaño máximo de 10MB');
       return;
     }
+
     this.selectedFile.set(file);
 
-    // Obtener metadata original
-    this.conversionService.viewConverted(file, 'auto').subscribe({
-      next: info => this.originalInfo.set(info),
-      error: err => console.error('Error al obtener resumen original:', err)
-    });
+    // Previsualización del XML local
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.xmlRaw.set(String(reader.result ?? ''));
+    };
+    reader.onerror = () => {
+      this.errorMessage.set('Error al leer el archivo.');
+    };
+    reader.readAsText(file);
   }
 
+  // --- BOTÓN CONVERTIR ---
   convertFile(): void {
     const file = this.selectedFile();
     if (!file) {
@@ -86,18 +107,11 @@ export class FileUploadComponent {
     this.errorMessage.set(null);
 
     this.conversionService.convertFile(file, 'auto').subscribe({
-      next: res => {
-        const blob = new Blob([res.convertedXml], { type: 'text/xml' });
-        const convertedFile = new File([blob], 'converted.xml', { type: 'text/xml' });
-
-        this.conversionService.viewConverted(convertedFile, 'auto').subscribe({
-          next: info => {
-            this.convertedInfo.set(info);
-            this.isConverted.set(true);
-            this.isLoading.set(false);
-          },
-          error: err => console.error('Error al obtener resumen convertido:', err)
-        });
+      next: (res: ConversionResult) => {
+        this.xmlRaw.set(this.xmlRaw()); // el original ya lo tenías
+        this.xmlConverted.set(res.convertedXml); // guardas el convertido
+        this.isConverted.set(true);
+        this.isLoading.set(false);
       },
       error: (err: HttpErrorResponse) => {
         this.errorMessage.set(err.message);
@@ -106,11 +120,11 @@ export class FileUploadComponent {
     });
   }
 
+  // --- BOTÓN VOLVER ---
   goBack(): void {
     this.isConverted.set(false);
     this.selectedFile.set(null);
-    this.originalInfo.set(null);
-    this.convertedInfo.set(null);
+    this.xmlRaw.set(null);
     this.errorMessage.set(null);
   }
 }

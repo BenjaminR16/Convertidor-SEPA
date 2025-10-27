@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, Input } from '@angular/core';
 import { FileInfo } from '../interfaces/file-info.model';
 
 @Component({
@@ -7,7 +7,9 @@ import { FileInfo } from '../interfaces/file-info.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FileViewComponent {
-  @Input() originalInfo: FileInfo | null = null;
-  @Input() convertedInfo: FileInfo | null = null;
+  xmlRaw = input<string | null>(null);
+
+  // XML convertido (nuevo)
+  xmlConverted = input<string | null>(null);
 }
 
