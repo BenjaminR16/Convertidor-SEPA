@@ -3,10 +3,8 @@ import { FileViewComponent } from "../file-view/file-view.component";
 import { ConversionService } from '../service/conversion.service';
 import { HttpErrorResponse } from '@angular/common/http';
 
-// Definimos la interfaz que coincide con tu DTO ConversionResult
 interface ConversionResult {
   convertedXml: string;
-  // agrega otros campos si tu backend devuelve más
 }
 
 @Component({

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, Input } from '@angular/core';
-import { FileInfo } from '../interfaces/file-info.model';
+import { FileInfo } from '../interfaces/file-info';
 
 @Component({
   selector: 'app-file-view',
