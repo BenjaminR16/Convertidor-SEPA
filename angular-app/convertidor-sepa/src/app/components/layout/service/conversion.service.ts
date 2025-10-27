@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ConversionResult } from '../interfaces/conversion-result';
-import { FileInfo } from '../interfaces/file-info';
+import { FileInfo } from '../interfaces/file-info.model';
 
 @Injectable({
   providedIn: 'root'
