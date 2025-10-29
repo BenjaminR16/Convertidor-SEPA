@@ -1,0 +1,31 @@
+<div class="max-w-6xl mx-auto mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- XML Original -->
+    <div class="card bg-base-100 shadow bg-gradient-to-r from-blue-100 via-purple-50 to-blue-100">
+        <div class="card-body">
+            <h5 class="card-title mb-2">Original</h5>
+            @if (xmlRaw()) {
+            <pre class="overflow-auto max-h-[60vh] p-4 rounded text-sm whitespace-pre-wrap bg-gray-100">
+{{ xmlRaw() }}
+            </pre>
+            } @else {
+            <p class="text-gray-500 text-center">No hay archivo seleccionado</p>
+            }
+        </div>
+    </div>
+
+    <!-- XML Convertido -->
+    <div class="card bg-base-100 shadow bg-gradient-to-r from-blue-100 via-purple-50 to-blue-100">
+        <div class="card-body">
+            <h5 class="card-title mb-2">Convertido</h5>
+            @if (xmlConverted()) {
+            <pre class="overflow-auto max-h-[60vh] p-4 rounded text-sm whitespace-pre-wrap bg-gray-100">
+{{ xmlConverted() }}
+            </pre>
+            } @else {
+            <p class="text-gray-500 text-center">Archivo no convertido aún</p>
+            }
+        </div>
+    </div>
+
+</div>
