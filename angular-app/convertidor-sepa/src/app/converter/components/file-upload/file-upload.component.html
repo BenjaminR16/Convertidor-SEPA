@@ -27,8 +27,11 @@
           <p class="text-sm text-success">Seleccionado: {{ selectedFile()!.name }}</p>
           }
           @if (errorMessage()) {
-          <p class="text-sm text-error">{{ errorMessage() }}</p>
+          <div class="alert alert-error shadow-lg mt-4">
+            <span>{{ errorMessage() }}</span>
+          </div>
           }
+
         </div>
 
         <div class="mt-4 flex flex-wrap items-center justify-center gap-2">

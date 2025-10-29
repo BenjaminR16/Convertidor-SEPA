@@ -50,14 +50,21 @@ export class ConversionService {
     let message: string;
 
     if (error.error instanceof ErrorEvent) {
-      // Errores del lado del cliente (por ejemplo, conexión perdida)
+      // Error del lado del cliente o de red
       message = `Error del cliente: ${error.error.message}`;
     } else {
-      // Errores devueltos por el backend
-      message = `Error del servidor (${error.status}): ${error.message}`;
+      // Errores devueltos por el backend 
+      if (typeof error.error === 'string') {
+        message = error.error;
+      } else if (error.error?.message) {
+        message = error.error.message;
+      } else {
+        message = `Error del servidor (${error.status}): ${error.statusText}`;
+      }
     }
 
-    console.error('⚠️ HTTP Error:', error);
+    console.error('Error HTTP capturado:', error);
     return throwError(() => new Error(message));
   }
+
 }

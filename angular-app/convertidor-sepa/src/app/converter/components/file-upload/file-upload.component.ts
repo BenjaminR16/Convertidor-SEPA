@@ -72,10 +72,18 @@ export class FileUploadComponent {
         });
         this.isLoading.set(false);
       },
-      error: (err: HttpErrorResponse) => {
-        this.errorMessage.set(err.message);
+      //manejo de errores
+      error: (err: any) => {
+        let msg = err.message || 'Error desconocido.';
+        if (msg.includes('Error de validación XSD')) {
+          msg = 'El archivo XML no cumple con el formato SEPA esperado (error de validación XSD).';
+        }
+
+        this.errorMessage.set(msg);
         this.isLoading.set(false);
       }
+
+
     });
   }
 
