@@ -1,5 +1,11 @@
 import { ChangeDetectionStrategy, Component, HostListener, signal } from '@angular/core';
 import { FileViewComponent } from "../file-view/file-view.component";
+import { ConversionService } from '../service/conversion.service';
+import { HttpErrorResponse } from '@angular/common/http';
+
+interface ConversionResult {
+  convertedXml: string;
+}
 
 @Component({
   selector: 'app-file-upload',
@@ -13,13 +19,17 @@ export class FileUploadComponent {
   protected readonly selectedFile = signal<File | null>(null);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly xmlRaw = signal<string | null>(null);
+  protected readonly isConverted = signal(false);
+  protected readonly isLoading = signal(false);
+  protected readonly xmlConverted = signal<string | null>(null);
 
-  //Cambio de input desde el selector de archivos
+  constructor(private conversionService: ConversionService) { }
+
+  // --- Manejo de input y drag & drop ---
   onFileInputChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input?.files && input.files.length > 0) {
       this.handleFiles(input.files);
-      // Permitir seleccionar el mismo archivo nuevamente limpiando el valor
       input.value = '';
     }
   }
@@ -38,21 +48,14 @@ export class FileUploadComponent {
     this.preventDefaults(event);
     this.isDragOver.set(false);
     const files = event.dataTransfer?.files;
-    if (files && files.length > 0) {
-      this.handleFiles(files);
-    }
+    if (files && files.length > 0) this.handleFiles(files);
   }
 
-  // Prevenir que se abra el archivo si fallas el drop
   @HostListener('document:dragover', ['$event'])
-  onDocumentDragOver(event: DragEvent): void {
-    event.preventDefault();
-  }
-
   @HostListener('document:drop', ['$event'])
-  onDocumentDrop(event: DragEvent): void {
+  preventDefaults(event: Event): void {
     event.preventDefault();
-
+    event.stopPropagation();
   }
 
   private handleFiles(files: FileList): void {
@@ -60,7 +63,6 @@ export class FileUploadComponent {
     const file = files[0];
     if (!file) return;
 
-    // Validaciones: solo .xml, max 10MB
     const maxBytes = 10 * 1024 * 1024;
     const isXmlByExt = file.name.toLowerCase().endsWith('.xml');
     const type = (file.type || '').toLowerCase();
@@ -80,11 +82,10 @@ export class FileUploadComponent {
 
     this.selectedFile.set(file);
 
-    // Leer contenido XML y preparar visor
+    // Previsualización del XML local
     const reader = new FileReader();
     reader.onload = () => {
-      const text = String(reader.result ?? '');
-      this.xmlRaw.set(text);
+      this.xmlRaw.set(String(reader.result ?? ''));
     };
     reader.onerror = () => {
       this.errorMessage.set('Error al leer el archivo.');
@@ -92,14 +93,36 @@ export class FileUploadComponent {
     reader.readAsText(file);
   }
 
-  private preventDefaults(event: Event): void {
-    event.preventDefault();
-    event.stopPropagation();
+  // --- BOTÓN CONVERTIR ---
+  convertFile(): void {
+    const file = this.selectedFile();
+    if (!file) {
+      this.errorMessage.set('No hay archivo seleccionado');
+      return;
+    }
+
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    this.conversionService.convertFile(file, 'auto').subscribe({
+      next: (res: ConversionResult) => {
+        this.xmlRaw.set(this.xmlRaw()); // el original ya lo tenías
+        this.xmlConverted.set(res.convertedXml); // guardas el convertido
+        this.isConverted.set(true);
+        this.isLoading.set(false);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.errorMessage.set(err.message);
+        this.isLoading.set(false);
+      }
+    });
   }
 
-
-
-
-
-
+  // --- BOTÓN VOLVER ---
+  goBack(): void {
+    this.isConverted.set(false);
+    this.selectedFile.set(null);
+    this.xmlRaw.set(null);
+    this.errorMessage.set(null);
+  }
 }
