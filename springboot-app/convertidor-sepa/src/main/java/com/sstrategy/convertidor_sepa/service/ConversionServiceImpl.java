@@ -37,7 +37,7 @@ public class ConversionServiceImpl implements ConversionService {
                 } catch (Exception v03e) {
                     // Permitir continuar con transformacion aunque el orden de elementos no vaya en orden
                 }
-                xslt = "/xslt/sct03-to-sdd08.xslt";
+                xslt = "/xslt/sct103-to-sdd108.xslt";
             } else if (xmlString.contains("urn:iso:std:iso:20022:tech:xsd:pain.001.003.03")) {
                 // pain.001.003.03 -> pain.008.001.08
                 try {
@@ -45,11 +45,11 @@ public class ConversionServiceImpl implements ConversionService {
                 } catch (Exception v303e) {
                     // Permitir continuar con transformacion aunque el orden de elementos no vaya en orden
                 }
-                xslt = "/xslt/sct00303-to-sdd08.xslt";
+                xslt = "/xslt/sct303-to-sdd108.xslt";
             } else if (xmlString.contains("urn:iso:std:iso:20022:tech:xsd:pain.001.001.09")) {
                 // pain.001.001.09 -> pain.008.001.08
                 validationService.validate(xmlBytes, "/xsd/pain.001.001.09.xsd");
-                xslt = "/xslt/sct-to-sdd.xslt";
+                xslt = "/xslt/sct109-to-sdd108.xslt";
             } else {
                 throw new IllegalArgumentException("Versión SCT no soportada. Se espera pain.001.001.03, pain.001.001.09 o pain.001.003.03");
             }
@@ -84,7 +84,7 @@ public class ConversionServiceImpl implements ConversionService {
                 } catch (Exception v02e) {
                     // Permitir continuar con transformacion aunque el orden de elementos no vaya en orden
                 }
-                xslt = "/xslt/sdd02-to-sct09.xslt";
+                xslt = "/xslt/sdd102-to-sct109.xslt";
             } else if (xmlString.contains("urn:iso:std:iso:20022:tech:xsd:pain.008.003.02")) {
                 // pain.008.003.02 -> pain.001.001.09
                 try {
@@ -92,11 +92,11 @@ public class ConversionServiceImpl implements ConversionService {
                 } catch (Exception v302e) {
                     // Permitir continuar con transformacion aunque el orden de elementos no vaya en orden
                 }
-                xslt = "/xslt/sdd00302-to-sct09.xslt";
+                xslt = "/xslt/sdd302-to-sct109.xslt";
             } else if (xmlString.contains("urn:iso:std:iso:20022:tech:xsd:pain.008.001.08")) {
                 // pain.008.001.08 -> pain.001.001.09 
                 validationService.validate(xmlBytes, "/xsd/pain.008.001.08.xsd");
-                xslt = "/xslt/sdd-to-sct.xslt";
+                xslt = "/xslt/sdd108-to-sct109.xslt";
             } else {
                 throw new IllegalArgumentException("Versión SDD no soportada. Se espera pain.008.001.02, pain.008.001.08 o pain.008.003.02");
             }
