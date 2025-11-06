@@ -17,6 +17,39 @@
 
     <app-xml-view [xmlRaw]="xmlRaw" [xmlConverted]="xmlConverted" />
 
+    <!-- Información del XML -->
+    @if (xmlInfo.length > 0) {
+    <div class="mt-12 mb-8">
+      <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-200/50 shadow-lg">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-slate-800">Información del XML</h3>
+            <p class="text-sm text-slate-600">Resumen de datos relevantes del archivo convertido</p>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          @for (info of xmlInfo; track info.label) {
+          <div class="bg-slate-50 rounded-lg p-4 border border-slate-200 hover:bg-slate-100 transition-colors">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">{{ info.icon }}</span>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-slate-600 truncate">{{ info.label }}</p>
+                <p class="text-lg font-bold text-slate-800 truncate" [title]="info.value">{{ info.value }}</p>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+    }
+
     <div class="flex flex-col sm:flex-row gap-4 justify-center mt-12 mb-8">
       <button class="group relative px-8 py-4 bg-gradient-to-r from-slate-600 to-slate-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 cursor-pointer" (click)="goBack()">
         <span class="relative z-10 flex items-center gap-2">
@@ -26,6 +59,17 @@
           Volver al inicio
         </span>
         <div class="absolute inset-0 bg-gradient-to-r from-slate-700 to-slate-800 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+      </button>
+
+      <button class="group relative px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 cursor-pointer" (click)="viewXml()">
+        <span class="relative z-10 flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+          </svg>
+          Visualizar XML
+        </span>
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
       </button>
 
       <button class="group relative px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 cursor-pointer" (click)="downloadXml()">
