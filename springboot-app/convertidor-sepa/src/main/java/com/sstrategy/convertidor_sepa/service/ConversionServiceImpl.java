@@ -9,6 +9,7 @@ import com.sstrategy.convertidor_sepa.exception.ValidationException;
 import com.sstrategy.convertidor_sepa.util.XsltTransformer;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import com.sstrategy.convertidor_sepa.util.XmlUtils;
 
 @Service
 public class ConversionServiceImpl implements ConversionService {
@@ -27,6 +28,9 @@ public class ConversionServiceImpl implements ConversionService {
                 throw new FileProcessingException("Archivo SCT vacío");
             byte[] xmlBytes = file.getBytes();
 
+            // Verificar que no contenga DTD
+            XmlUtils.ensureNoDtd(xmlBytes);
+
             String xmlString = new String(xmlBytes, StandardCharsets.UTF_8);
 
             final String xslt;
@@ -35,7 +39,8 @@ public class ConversionServiceImpl implements ConversionService {
                 try {
                     validationService.validate(xmlBytes, "/xsd/pain.001.001.03.xsd");
                 } catch (Exception v03e) {
-                    // Permitir continuar con transformacion aunque el orden de elementos no vaya en orden
+                    // Permitir continuar con transformacion aunque el orden de elementos no vaya en
+                    // orden
                 }
                 xslt = "/xslt/sct103-to-sdd108.xslt";
             } else if (xmlString.contains("urn:iso:std:iso:20022:tech:xsd:pain.001.003.03")) {
@@ -43,7 +48,8 @@ public class ConversionServiceImpl implements ConversionService {
                 try {
                     validationService.validate(xmlBytes, "/xsd/pain.001.003.03.xsd");
                 } catch (Exception v303e) {
-                    // Permitir continuar con transformacion aunque el orden de elementos no vaya en orden
+                    // Permitir continuar con transformacion aunque el orden de elementos no vaya en
+                    // orden
                 }
                 xslt = "/xslt/sct303-to-sdd108.xslt";
             } else if (xmlString.contains("urn:iso:std:iso:20022:tech:xsd:pain.001.001.09")) {
@@ -51,7 +57,8 @@ public class ConversionServiceImpl implements ConversionService {
                 validationService.validate(xmlBytes, "/xsd/pain.001.001.09.xsd");
                 xslt = "/xslt/sct109-to-sdd108.xslt";
             } else {
-                throw new IllegalArgumentException("Versión SCT no soportada. Se espera pain.001.001.03, pain.001.001.09 o pain.001.003.03");
+                throw new IllegalArgumentException(
+                        "Versión SCT no soportada. Se espera pain.001.001.03, pain.001.001.09 o pain.001.003.03");
             }
 
             String convertedXml = XsltTransformer.transform(file, xslt);
@@ -74,6 +81,9 @@ public class ConversionServiceImpl implements ConversionService {
                 throw new FileProcessingException("Archivo SDD vacío");
             byte[] xmlBytes = file.getBytes();
 
+            // Verificar que no contenga DTD
+            XmlUtils.ensureNoDtd(xmlBytes);
+
             String xmlString = new String(xmlBytes, StandardCharsets.UTF_8);
 
             final String xslt;
@@ -82,7 +92,8 @@ public class ConversionServiceImpl implements ConversionService {
                 try {
                     validationService.validate(xmlBytes, "/xsd/pain.008.001.02.xsd");
                 } catch (Exception v02e) {
-                    // Permitir continuar con transformacion aunque el orden de elementos no vaya en orden
+                    // Permitir continuar con transformacion aunque el orden de elementos no vaya en
+                    // orden
                 }
                 xslt = "/xslt/sdd102-to-sct109.xslt";
             } else if (xmlString.contains("urn:iso:std:iso:20022:tech:xsd:pain.008.003.02")) {
@@ -90,15 +101,17 @@ public class ConversionServiceImpl implements ConversionService {
                 try {
                     validationService.validate(xmlBytes, "/xsd/pain.008.003.02.xsd");
                 } catch (Exception v302e) {
-                    // Permitir continuar con transformacion aunque el orden de elementos no vaya en orden
+                    // Permitir continuar con transformacion aunque el orden de elementos no vaya en
+                    // orden
                 }
                 xslt = "/xslt/sdd302-to-sct109.xslt";
             } else if (xmlString.contains("urn:iso:std:iso:20022:tech:xsd:pain.008.001.08")) {
-                // pain.008.001.08 -> pain.001.001.09 
+                // pain.008.001.08 -> pain.001.001.09
                 validationService.validate(xmlBytes, "/xsd/pain.008.001.08.xsd");
                 xslt = "/xslt/sdd108-to-sct109.xslt";
             } else {
-                throw new IllegalArgumentException("Versión SDD no soportada. Se espera pain.008.001.02, pain.008.001.08 o pain.008.003.02");
+                throw new IllegalArgumentException(
+                        "Versión SDD no soportada. Se espera pain.008.001.02, pain.008.001.08 o pain.008.003.02");
             }
 
             String convertedXml = XsltTransformer.transform(file, xslt);
