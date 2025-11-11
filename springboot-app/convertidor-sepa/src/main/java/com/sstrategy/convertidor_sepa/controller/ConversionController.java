@@ -41,7 +41,8 @@ public class ConversionController {
             } else if (xml.contains("urn:iso:std:iso:20022:tech:xsd:pain.008")) {
                 normalized = "sdd-to-sct";
             } else {
-                throw new IllegalArgumentException("No se pudo detectar el tipo del archivo (SCT/SDD). Especifique 'direction'.");
+                throw new IllegalArgumentException(
+                        "No se pudo detectar el tipo del archivo (SCT/SDD). Especifique 'direction'.");
             }
         }
 
@@ -50,13 +51,14 @@ public class ConversionController {
         } else if ("sdd-to-sct".equalsIgnoreCase(normalized)) {
             return conversionService.convertSddToSct(file);
         } else {
-            throw new InvalidConversionDirectionException("Dirección de conversión inválida: " + direction + ". Valores permitidos: sct-to-sdd, sdd-to-sct");
+            throw new InvalidConversionDirectionException(
+                    "Dirección de conversión inválida: " + direction + ". Valores permitidos: sct-to-sdd, sdd-to-sct");
         }
     }
 
     @PostMapping
     public ResponseEntity<?> convert(@RequestParam MultipartFile file,
-        @RequestParam(required = false) String direction) {
+            @RequestParam(required = false) String direction) {
         try {
             ConversionResult result = convertFile(file, direction);
             return ResponseEntity.ok(result);
@@ -69,7 +71,7 @@ public class ConversionController {
 
     @PostMapping("/download")
     public ResponseEntity<?> download(@RequestParam MultipartFile file,
-        @RequestParam(required = false) String direction) {
+            @RequestParam(required = false) String direction) {
         try {
             ConversionResult result = convertFile(file, direction);
 
@@ -93,7 +95,7 @@ public class ConversionController {
 
     @PostMapping("/executive-view")
     public ResponseEntity<?> viewConverted(@RequestParam MultipartFile file,
-        @RequestParam(required = false) String direction) {
+            @RequestParam(required = false) String direction) {
         try {
             ConversionResult result = convertFile(file, direction);
 
