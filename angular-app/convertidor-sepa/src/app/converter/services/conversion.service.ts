@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -12,7 +12,7 @@ export class ConversionService {
 
   private readonly apiUrl = 'http://localhost:8080/api/v1/convert';
 
-  constructor(private http: HttpClient) { }
+  private readonly http = inject(HttpClient);
 
   convertFile(file: File, direction: string = 'auto'): Observable<ConversionResult> {
     const formData = new FormData();

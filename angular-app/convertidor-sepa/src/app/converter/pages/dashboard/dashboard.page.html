@@ -1,0 +1,26 @@
+<main class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
+    <div class="max-w-6xl mx-auto px-4 py-8 md:py-16">
+
+        <div
+            class="bg-gradient-to-b from-white/90 via-blue-50/70 to-purple-50/50 rounded-3xl p-8 md:p-12 border border-slate-200/50 shadow-xl backdrop-blur-sm space-y-12">
+
+            <app-hero-section></app-hero-section>
+
+            <app-how-it-works></app-how-it-works>
+
+            <app-upload-area [isDragOver]="isDragOver()" [selectedFile]="selectedFile()" [errorMessage]="errorMessage()"
+                (fileInputChange)="onFileInputChange($event)" (dragOver)="onDragOver($event)"
+                (dragLeave)="onDragLeave($event)" (drop)="onDrop($event)" (convertFile)="convertFile()">
+            </app-upload-area>
+
+
+
+            <app-conversions-available></app-conversions-available>
+
+        </div>
+
+    </div>
+
+
+
+</main>
