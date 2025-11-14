@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, computed, effect, inject, input, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 import { ConversionService } from '../../../services/conversion.service';
 import { buildXmlInfo } from '../info-grid/conversion-info-grid.component';
 
