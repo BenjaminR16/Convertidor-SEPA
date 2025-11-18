@@ -78,24 +78,31 @@ public class ConversionServiceImpl implements ConversionService {
                     .orElseThrow(() -> new IllegalArgumentException(unsupportedMessage));
 
             // Validar entrada
-            validationService.validate(xmlBytes, spec.inputXsd());
+            try {
+                validationService.validate(xmlBytes, spec.inputXsd());
+            } catch (Exception ignored) {
+                log.warn("Validación inicial falló para {}, continuando transformación...", spec.inputXsd());
+            }
 
             // Transformar
             String convertedXml = XsltTransformer.transform(file, spec.xsltPath());
+            log.info("Transformación {} completada con XSLT: {}", typeLabel, spec.xsltPath());
 
             // Validar salida
             validationService.validate(convertedXml.getBytes(StandardCharsets.UTF_8), outputXsd);
+            log.info("Validación final exitosa contra {}", outputXsd);
 
             return new ConversionResult(convertedXml);
 
         } catch (FileProcessingException | ValidationException e) {
             throw e;
         } catch (Exception e) {
+            log.error("{}: {}", errorPrefix, e.getMessage(), e);
             throw new ConversionException(errorPrefix + ": " + e.getMessage(), e);
         }
     }
 
-    // guarda las especificaciones de conversión xsd y xslt
+    // guarda las especificaciones de conversión (input XSD y XSLT)
     private record ConversionSpec(String inputXsd, String xsltPath) {
     }
 }
