@@ -102,7 +102,7 @@ public class ConversionServiceImpl implements ConversionService {
         }
     }
 
-    // guarda las especificaciones de conversión (input XSD y XSLT)
+    // guarda la especificación de conversión inputXsd + xsltPath
     private record ConversionSpec(String inputXsd, String xsltPath) {
     }
 }
