@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnDestroy, computed, effect, inject
 import { Router } from '@angular/router';
 import { jsPDF } from 'jspdf';
 import { ConversionService } from '../../../services/conversion.service';
-import { buildXmlInfo } from '../info-grid/conversion-info-grid.component';
+import { FieldNode, valoresGenericos } from '../../../util/extract-values';
 
 @Component({
   selector: 'app-conversion-actions',
@@ -100,54 +100,74 @@ export class ConversionActionsComponent implements OnDestroy {
     const converted = this.xmlConverted();
     if (!converted) return;
 
-    const info = buildXmlInfo(converted);
+    const fields: FieldNode[] = valoresGenericos(converted); // ya es plano
 
     const doc = new jsPDF();
-    const margin = 20;
-    let yPosition = 30;
-    const lineHeight = 8;
+    const margin = 15;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const usableWidth = pageWidth - margin * 2;
 
+    let y = 25;
+
+    // Header
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(18);
-    doc.text('Resumen de conversión SEPA', margin, yPosition);
+    doc.setFontSize(20);
+    doc.text('Resumen de Conversión SEPA', margin, y);
+    doc.setDrawColor(52, 152, 219);
+    doc.setLineWidth(1.2);
+    doc.line(margin, y + 3, pageWidth - margin, y + 3);
+    y += 18;
 
+    // Ancho dinámico de label
+    doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    yPosition += lineHeight * 1.5;
+    const labelWidths = fields.map(f => doc.getTextWidth(`${f.label}:`));
+    const maxLabelWidth = Math.min(Math.max(...labelWidths), 80); // ancho máximo dinámico
 
-    if (!info.length) {
-      doc.text('No se encontraron datos relevantes para este archivo.', margin, yPosition);
-      doc.save('resumen-conversion.pdf');
-      return;
-    }
+    // Tabla con estilo cards
+    const rowPadding = 6;
+    const rowSpacing = 4;
 
-    info.forEach((item) => {
-      const availableHeight = doc.internal.pageSize.getHeight() - margin;
-      if (yPosition + lineHeight * 2 > availableHeight) {
+    fields.forEach((f, index) => {
+      // Envolver el texto
+      const wrapped = doc.splitTextToSize(f.value, usableWidth - maxLabelWidth - rowPadding * 2);
+      const rowHeight = Math.max(18, wrapped.length * 7 + rowPadding * 2);
+
+      // Saltar de página si no cabe
+      if (y + rowHeight + margin > doc.internal.pageSize.getHeight()) {
         doc.addPage();
-        yPosition = margin;
+        y = margin;
       }
 
+      // Color alterno
+      if (index % 2 === 0) {
+        doc.setFillColor(245, 247, 250); // claro
+      } else {
+        doc.setFillColor(255, 255, 255); // blanco
+      }
+
+      // Dibujar fondo
+      doc.setDrawColor(200, 200, 200);
+      doc.roundedRect(margin, y, usableWidth, rowHeight, 2, 2, 'FD');
+
+      // Label
       doc.setFont('helvetica', 'bold');
-      doc.text(item.label, margin, yPosition);
-      yPosition += lineHeight;
+      doc.setFontSize(11);
+      doc.setTextColor(52, 73, 94);
+      doc.text(`${f.label}:`, margin + rowPadding, y + 10);
 
+      // Valor alineado automáticamente
+      const labelWidthReal = doc.getTextWidth(`${f.label}:`);
       doc.setFont('helvetica', 'normal');
-      const wrappedValue = doc.splitTextToSize(item.value, doc.internal.pageSize.getWidth() - margin * 2);
-      wrappedValue.forEach((line: string) => {
-        if (yPosition + lineHeight > availableHeight) {
-          doc.addPage();
-          yPosition = margin;
-        }
-        doc.text(line, margin, yPosition);
-        yPosition += lineHeight;
-      });
+      doc.setTextColor(44, 62, 80);
+      doc.text(wrapped, margin + rowPadding + labelWidthReal + 3, y + 10);
 
-      yPosition += lineHeight * 0.5;
+      y += rowHeight + rowSpacing;
     });
 
-    doc.save('resumen-conversion.pdf');
+    doc.save('resumen-sepa.pdf');
   }
+
 
   private clearSpinnerDelay() {
     if (this.spinnerTimeout !== null) {

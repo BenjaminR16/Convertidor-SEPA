@@ -84,25 +84,9 @@
 
             <sct:DbtrAgt>
                 <sct:FinInstnId>
-                    <xsl:choose>
-                        <xsl:when test="sdd:CdtrAgt/sdd:FinInstnId/sdd:BICFI">
-                            <sct:BICFI>
-                                <xsl:value-of select="sdd:CdtrAgt/sdd:FinInstnId/sdd:BICFI" />
-                            </sct:BICFI>
-                        </xsl:when>
-                        <xsl:when test="sdd:CdtrAgt/sdd:FinInstnId/sdd:Othr/sdd:Id">
-                            <sct:Othr>
-                                <sct:Id>
-                                    <xsl:value-of select="sdd:CdtrAgt/sdd:FinInstnId/sdd:Othr/sdd:Id" />
-                                </sct:Id>
-                            </sct:Othr>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <sct:Othr>
-                                <sct:Id>NOTPROVIDED</sct:Id>
-                            </sct:Othr>
-                        </xsl:otherwise>
-                    </xsl:choose>
+                    <sct:BICFI>
+                        <xsl:value-of select="sdd:CdtrAgt/sdd:FinInstnId/sdd:BICFI" />
+                    </sct:BICFI>
                 </sct:FinInstnId>
             </sct:DbtrAgt>
             <xsl:for-each select="sdd:DrctDbtTxInf">
@@ -119,25 +103,9 @@
                     </sct:Amt>
                     <sct:CdtrAgt>
                         <sct:FinInstnId>
-                            <xsl:choose>
-                                <xsl:when test="sdd:DbtrAgt/sdd:FinInstnId/sdd:BICFI">
-                                    <sct:BICFI>
-                                        <xsl:value-of select="sdd:DbtrAgt/sdd:FinInstnId/sdd:BICFI" />
-                                    </sct:BICFI>
-                                </xsl:when>
-                                <xsl:when test="sdd:DbtrAgt/sdd:FinInstnId/sdd:Othr/sdd:Id">
-                                    <sct:Othr>
-                                        <sct:Id>
-                                            <xsl:value-of select="sdd:DbtrAgt/sdd:FinInstnId/sdd:Othr/sdd:Id" />
-                                        </sct:Id>
-                                    </sct:Othr>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <sct:Othr>
-                                        <sct:Id>NOTPROVIDED</sct:Id>
-                                    </sct:Othr>
-                                </xsl:otherwise>
-                            </xsl:choose>
+                            <sct:BICFI>
+                                <xsl:value-of select="sdd:DbtrAgt/sdd:FinInstnId/sdd:BICFI" />
+                            </sct:BICFI>
                         </sct:FinInstnId>
                     </sct:CdtrAgt>
                     <sct:Cdtr>
@@ -152,13 +120,11 @@
                             </sct:IBAN>
                         </sct:Id>
                     </sct:CdtrAcct>
-                    <xsl:if test="sdd:RmtInf/sdd:Ustrd">
-                        <sct:RmtInf>
-                            <sct:Ustrd>
-                                <xsl:value-of select="sdd:RmtInf/sdd:Ustrd" />
-                            </sct:Ustrd>
-                        </sct:RmtInf>
-                    </xsl:if>
+                    <sct:RmtInf>
+                        <sct:Ustrd>
+                            <xsl:value-of select="sdd:RmtInf/sdd:Ustrd" />
+                        </sct:Ustrd>
+                    </sct:RmtInf>
                 </sct:CdtTrfTxInf>
             </xsl:for-each>
         </sct:PmtInf>

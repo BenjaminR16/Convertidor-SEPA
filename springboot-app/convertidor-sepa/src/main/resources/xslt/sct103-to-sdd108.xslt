@@ -85,15 +85,19 @@
                         <sdd:CdtrAgt>
                             <sdd:FinInstnId>
                                 <xsl:choose>
-                                    <xsl:when test="sct:DbtrAgt/sct:FinInstnId/sct:BIC or sct:CdtTrfTxInf[1]/sct:DbtrAgt/sct:FinInstnId/sct:BIC">
+                                    <xsl:when
+                                        test="sct:DbtrAgt/sct:FinInstnId/sct:BIC or sct:CdtTrfTxInf[1]/sct:DbtrAgt/sct:FinInstnId/sct:BIC">
                                         <sdd:BICFI>
-                                            <xsl:value-of select="sct:DbtrAgt/sct:FinInstnId/sct:BIC | sct:CdtTrfTxInf[1]/sct:DbtrAgt/sct:FinInstnId/sct:BIC" />
+                                            <xsl:value-of
+                                                select="sct:DbtrAgt/sct:FinInstnId/sct:BIC | sct:CdtTrfTxInf[1]/sct:DbtrAgt/sct:FinInstnId/sct:BIC" />
                                         </sdd:BICFI>
                                     </xsl:when>
-                                    <xsl:when test="sct:DbtrAgt/sct:FinInstnId/sct:Othr/sct:Id or sct:CdtTrfTxInf[1]/sct:DbtrAgt/sct:FinInstnId/sct:Othr/sct:Id">
+                                    <xsl:when
+                                        test="sct:DbtrAgt/sct:FinInstnId/sct:Othr/sct:Id or sct:CdtTrfTxInf[1]/sct:DbtrAgt/sct:FinInstnId/sct:Othr/sct:Id">
                                         <sdd:Othr>
                                             <sdd:Id>
-                                                <xsl:value-of select="sct:DbtrAgt/sct:FinInstnId/sct:Othr/sct:Id | sct:CdtTrfTxInf[1]/sct:DbtrAgt/sct:FinInstnId/sct:Othr/sct:Id" />
+                                                <xsl:value-of
+                                                    select="sct:DbtrAgt/sct:FinInstnId/sct:Othr/sct:Id | sct:CdtTrfTxInf[1]/sct:DbtrAgt/sct:FinInstnId/sct:Othr/sct:Id" />
                                             </sdd:Id>
                                         </sdd:Othr>
                                     </xsl:when>
@@ -148,13 +152,16 @@
                                         <xsl:choose>
                                             <xsl:when test="sct:CdtrAgt/sct:FinInstnId/sct:BIC">
                                                 <sdd:BICFI>
-                                                    <xsl:value-of select="sct:CdtrAgt/sct:FinInstnId/sct:BIC" />
+                                                    <xsl:value-of
+                                                        select="sct:CdtrAgt/sct:FinInstnId/sct:BIC" />
                                                 </sdd:BICFI>
                                             </xsl:when>
-                                            <xsl:when test="sct:CdtrAgt/sct:FinInstnId/sct:Othr/sct:Id">
+                                            <xsl:when
+                                                test="sct:CdtrAgt/sct:FinInstnId/sct:Othr/sct:Id">
                                                 <sdd:Othr>
                                                     <sdd:Id>
-                                                        <xsl:value-of select="sct:CdtrAgt/sct:FinInstnId/sct:Othr/sct:Id" />
+                                                        <xsl:value-of
+                                                            select="sct:CdtrAgt/sct:FinInstnId/sct:Othr/sct:Id" />
                                                     </sdd:Id>
                                                 </sdd:Othr>
                                             </xsl:when>
