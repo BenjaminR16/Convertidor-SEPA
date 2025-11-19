@@ -78,7 +78,7 @@ export function valoresGenericos(xml: string): FieldNode[] {
         "CtryOfRes": "País de residencia",
     };
 
-    function traverse(node: Element): FieldNode[] {
+    function read(node: Element): FieldNode[] {
         const tag = node.tagName.includes(":") ? node.tagName.split(":")[1] : node.tagName;
         const children = Array.from(node.children);
 
@@ -93,10 +93,10 @@ export function valoresGenericos(xml: string): FieldNode[] {
         //recorrer hijos
         let results: FieldNode[] = [];
         children.forEach(child => {
-            results.push(...traverse(child));
+            results.push(...read(child));
         });
         return results;
     }
 
-    return traverse(root);
+    return read(root);
 }
