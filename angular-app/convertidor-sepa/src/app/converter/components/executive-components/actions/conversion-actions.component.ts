@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnDestroy, computed, effect, inject
 import { Router } from '@angular/router';
 import { jsPDF } from 'jspdf';
 import { ConversionService } from '../../../services/conversion.service';
-import { FieldNode, valoresGenericos } from '../../../util/extract-values';
+import { FieldNode, valoresGenericos } from '../../../util/valoresGenericos';
 
 @Component({
   selector: 'app-conversion-actions',
