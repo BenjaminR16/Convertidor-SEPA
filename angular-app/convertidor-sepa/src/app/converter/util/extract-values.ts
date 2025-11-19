@@ -90,8 +90,7 @@ export function valoresGenericos(xml: string): FieldNode[] {
             }
             return [];
         }
-
-        // Si tiene hijos, recorremos recursivamente
+        //recorrer hijos
         let results: FieldNode[] = [];
         children.forEach(child => {
             results.push(...traverse(child));

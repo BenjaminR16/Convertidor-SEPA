@@ -129,7 +129,6 @@ export class ConversionActionsComponent implements OnDestroy {
     const rowSpacing = 4;
 
     fields.forEach((f, index) => {
-      // Envolver el texto
       const wrapped = doc.splitTextToSize(f.value, usableWidth - maxLabelWidth - rowPadding * 2);
       const rowHeight = Math.max(18, wrapped.length * 7 + rowPadding * 2);
 
@@ -141,16 +140,14 @@ export class ConversionActionsComponent implements OnDestroy {
 
       // Color alterno
       if (index % 2 === 0) {
-        doc.setFillColor(245, 247, 250); // claro
+        doc.setFillColor(245, 247, 250);
       } else {
-        doc.setFillColor(255, 255, 255); // blanco
+        doc.setFillColor(255, 255, 255);
       }
 
-      // Dibujar fondo
       doc.setDrawColor(200, 200, 200);
       doc.roundedRect(margin, y, usableWidth, rowHeight, 2, 2, 'FD');
 
-      // Label
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
       doc.setTextColor(52, 73, 94);
