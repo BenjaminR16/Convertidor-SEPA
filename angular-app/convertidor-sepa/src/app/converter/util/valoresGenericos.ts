@@ -12,13 +12,15 @@ export function valoresGenericos(xml: string): FieldNode[] {
     const root = xmlDoc.documentElement;
 
     const tagNames: Record<string, string> = {
-        "CstmrDrctDbtInitn": "Cliente domiciliación SEPA",
+        "Document": "Documento raíz",
+        "CstmrCdtTrfInitn": "Cliente – Transferencia SEPA (pain.001)",
+        "CstmrDrctDbtInitn": "Cliente – Domiciliación SEPA (pain.008)",
         "GrpHdr": "Cabecera del mensaje",
         "MsgId": "ID del mensaje",
-        "CreDtTm": "Fecha de creación",
+        "CreDtTm": "Fecha y hora de creación",
         "NbOfTxs": "Número de transacciones",
         "CtrlSum": "Importe total",
-        "InitgPty": "Parte que inicia el pago",
+        "InitgPty": "Parte iniciadora",
         "Nm": "Nombre",
         "Id": "Identificación",
         "OrgId": "Identificación de organización",
@@ -26,70 +28,76 @@ export function valoresGenericos(xml: string): FieldNode[] {
         "Othr": "Otra identificación",
         "BICOrBEI": "Código BIC o BEI",
         "PmtInf": "Información del pago",
-        "PmtInfId": "ID del pago",
+        "PmtInfId": "ID de la información del pago",
         "PmtMtd": "Método de pago",
-        "BtchBookg": "Agrupación por lotes",
-        "ReqdColltnDt": "Fecha de cobro requerida",
-        "ChrgBr": "Responsable de los cargos",
+        "BtchBookg": "Contabilización por lotes",
+        "ReqdExctnDt": "Fecha de ejecución requerida",
+        "ReqdColltnDt": "Fecha de cobro requerida (SEPA core)",
+        "ChrgBr": "Soporte de gastos",
         "PmtTpInf": "Tipo de pago",
         "SvcLvl": "Nivel de servicio",
         "LclInstrm": "Instrumento local",
         "SeqTp": "Tipo de secuencia",
-        "CtgyPurp": "Propósito / Categoría",
+        "CtgyPurp": "Propósito / categoría",
         "Cd": "Código",
-        "UltmtCdtr": "Acreedor final",
+        "PstlAdr": "Dirección postal",
+        "Ctry": "País",
+        "AdrLine": "Línea de dirección",
+        "Dbtr": "Deudor / Ordenante",
+        "DbtrAcct": "Cuenta del deudor",
+        "DbtrAgt": "Agente del deudor",
+        "UltmtDbtr": "Deudor final",
+        "Purp": "Propósito del pago",
         "Cdtr": "Acreedor / Beneficiario",
         "CdtrAcct": "Cuenta del acreedor",
         "Ccy": "Moneda",
         "CdtrAgt": "Agente del acreedor",
-        "FinInstnId": "Entidad financiera",
+        "FinInstnId": "Identificación de la entidad financiera",
         "BIC": "Código BIC",
-        "CdtrSchmeId": "Identificación del esquema de acreedor",
+        "CdtrSchmeId": "Identificador de acreedor SEPA",
         "SchmeNm": "Nombre del esquema",
-        "Prtry": "Propietario",
-        "DrctDbtTxInf": "Transacción domiciliación",
+        "Prtry": "Propietario / valor propio",
         "PmtId": "Identificación del pago",
         "InstrId": "ID de instrucción",
-        "EndToEndId": "ID EndToEnd",
-        "InstdAmt": "Importe a instruir",
-        "DrctDbtTx": "Detalle de domiciliación",
+        "EndToEndId": "ID End-to-End",
+        "Amt": "Importe",
+        "InstdAmt": "Importe instruido",
+        "DrctDbtTxInf": "Información de domiciliación",
+        "DrctDbtTx": "Transacción de domiciliación",
         "MndtRltdInf": "Información del mandato",
         "MndtId": "ID del mandato",
-        "DtOfSgntr": "Fecha de firma",
+        "DtOfSgntr": "Fecha de firma del mandato",
         "AmdmntInd": "Indicador de enmienda",
-        "AmdmntInfDtls": "Detalles de enmienda",
+        "AmdmntInfDtls": "Detalles de la enmienda",
         "OrgnlDbtrAcct": "Cuenta original del deudor",
-        "Dbtr": "Deudor / Ordenante",
-        "DbtrAcct": "Cuenta del deudor",
-        "DbtrAgt": "Agente del deudor",
-        "UltmtDbtr": "Ordenante final",
-        "Purp": "Propósito de la transacción",
         "RmtInf": "Información de remesa",
         "Ustrd": "Concepto no estructurado",
         "Strd": "Concepto estructurado",
         "CdOrPrtry": "Código o propietario",
         "Issr": "Emisor",
         "Ref": "Referencia",
-        "PstlAdr": "Dirección postal",
-        "Ctry": "País",
-        "AdrLine": "Línea de dirección",
+        "Tp": "Tipo de referencia",
+        "CdtrRefInf": "Información de referencia del acreedor",
+        "IBAN": "IBAN",
         "Dt": "Fecha",
-        "BICFI": "Código BIC del banco",
+        "BICFI": "Código BIC de la entidad financiera",
         "CtryOfRes": "País de residencia",
     };
+
 
     function read(node: Element): FieldNode[] {
         const tag = node.tagName.includes(":") ? node.tagName.split(":")[1] : node.tagName;
         const children = Array.from(node.children);
-
-        // Solo los nodos hoja tienen valor
+        //obtener valor si no tiene hijos
         if (children.length === 0) {
-            const value = node.textContent?.trim();
+            let value = node.textContent?.trim() || "";
+            value = value.replace(/\s+/g, " ");
             if (value && !value.startsWith("urn:")) {
                 return [{ label: tagNames[tag] || tag, value }];
             }
             return [];
         }
+
         //recorrer hijos
         let results: FieldNode[] = [];
         children.forEach(child => {
@@ -97,6 +105,5 @@ export function valoresGenericos(xml: string): FieldNode[] {
         });
         return results;
     }
-
     return read(root);
 }
