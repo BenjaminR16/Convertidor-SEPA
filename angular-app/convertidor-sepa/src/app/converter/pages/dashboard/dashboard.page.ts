@@ -65,9 +65,41 @@ export class DashboardPage {
 
         this.selectedFile.set(file);
         const reader = new FileReader();
-        reader.onload = () => this.xmlRaw.set(String(reader.result ?? ''));
-        reader.onerror = () => this.errorMessage.set('Error leyendo archivo');
+        reader.onload = () => {
+            const content = String(reader.result ?? '');
+            const validationError = this.validateXml(content);
+            if (validationError) {
+                this.selectedFile.set(null);
+                this.xmlRaw.set(null);
+                this.errorMessage.set(validationError);
+                return;
+            }
+            this.xmlRaw.set(content);
+        };
+        reader.onerror = () => { this.xmlRaw.set(null); this.errorMessage.set('Error leyendo archivo'); };
         reader.readAsText(file);
+    }
+
+    private validateXml(content: string): string | null {
+        if (!content.trim()) return 'El archivo XML está vacío';
+        if (typeof DOMParser === 'undefined') return null;
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(content, 'application/xml');
+        const parserError = doc.querySelector('parsererror');
+        if (parserError) return 'El XML tiene errores de formato.';
+
+        
+        const root = doc.documentElement;
+        if (!root || root.localName.toLowerCase() !== 'document') {
+            return 'El XML debe tener un nodo raíz <Document>.';
+        }
+
+        const namespace = root.namespaceURI ?? '';
+        const isSepaNamespace = /pain\.\d{3}\.\d{3}\.\d{2}/.test(namespace);
+        if (!isSepaNamespace) return 'El XML no pertenece a un esquema SEPA reconocido.';
+
+        return null;
     }
 
     convertFile() {
