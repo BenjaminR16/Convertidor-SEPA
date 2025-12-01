@@ -2,11 +2,12 @@
 <xsl:stylesheet
     version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:sct="urn:iso:std:iso:20022:tech:xsd:pain.001.001.09"
+    xmlns:sct="urn:iso:std:iso:20022:tech:xsd:pain.001.001.03"
     xmlns:sdd="urn:iso:std:iso:20022:tech:xsd:pain.008.001.08"
     exclude-result-prefixes="sct">
 
     <xsl:output method="xml" encoding="UTF-8" indent="yes" />
+
     <xsl:template match="/sct:Document">
         <sdd:Document xmlns:sdd="urn:iso:std:iso:20022:tech:xsd:pain.008.001.08">
             <sdd:CstmrDrctDbtInitn>
@@ -41,7 +42,7 @@
                                 </xsl:choose>
                             </sdd:SeqTp>
                         </sdd:PmtTpInf>
-                        <xsl:if test="sct:ReqdExctnDt/sct:Dt or sct:ReqdExctnDt/sct:DtTm">
+                        <xsl:if test="sct:ReqdExctnDt">
                             <sdd:ReqdColltnDt>
                                 <xsl:choose>
                                     <xsl:when test="sct:ReqdExctnDt/sct:Dt">
@@ -66,20 +67,6 @@
                                         select="sct:Dbtr/sct:PstlAdr/sct:Ctry | sct:CdtTrfTxInf[1]/sct:Dbtr/sct:PstlAdr/sct:Ctry" />
                                 </sdd:CtryOfRes>
                             </xsl:if>
-                            <xsl:if test="sct:Dbtr/sct:Id or sct:CdtTrfTxInf[1]/sct:Dbtr/sct:Id">
-                                <sdd:Id>
-                                    <xsl:if test="sct:Dbtr/sct:Id/sct:OrgId/sct:Othr/sct:Id">
-                                        <sdd:OrgId>
-                                            <sdd:Othr>
-                                                <sdd:Id>
-                                                    <xsl:value-of
-                                                        select="sct:Dbtr/sct:Id/sct:OrgId/sct:Othr/sct:Id | sct:CdtTrfTxInf[1]/sct:Dbtr/sct:Id/sct:OrgId/sct:Othr/sct:Id" />
-                                                </sdd:Id>
-                                            </sdd:Othr>
-                                        </sdd:OrgId>
-                                    </xsl:if>
-                                </sdd:Id>
-                            </xsl:if>
                         </sdd:Cdtr>
                         <sdd:CdtrAcct>
                             <sdd:Id>
@@ -89,17 +76,47 @@
                                 </sdd:IBAN>
                             </sdd:Id>
                         </sdd:CdtrAcct>
-                        <xsl:if
-                            test="sct:DbtrAgt/sct:FinInstnId/sct:BICFI or sct:CdtTrfTxInf[1]/sct:DbtrAgt/sct:FinInstnId/sct:BICFI">
-                            <sdd:CdtrAgt>
-                                <sdd:FinInstnId>
-                                    <sdd:BICFI>
-                                        <xsl:value-of
-                                            select="sct:DbtrAgt/sct:FinInstnId/sct:BICFI | sct:CdtTrfTxInf[1]/sct:DbtrAgt/sct:FinInstnId/sct:BICFI" />
-                                    </sdd:BICFI>
-                                </sdd:FinInstnId>
-                            </sdd:CdtrAgt>
-                        </xsl:if>
+                        <sdd:CdtrAgt>
+                            <sdd:FinInstnId>
+                                <xsl:choose>
+                                    <xsl:when test="sct:DbtrAgt/sct:FinInstnId/sct:BICFI">
+                                        <sdd:BICFI>
+                                            <xsl:value-of
+                                                select="sct:DbtrAgt/sct:FinInstnId/sct:BICFI | sct:CdtTrfTxInf[1]/sct:DbtrAgt/sct:FinInstnId/sct:BICFI" />
+                                        </sdd:BICFI>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <sdd:Othr>
+                                            <sdd:Id>NOTPROVIDED</sdd:Id>
+                                        </sdd:Othr>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </sdd:FinInstnId>
+                        </sdd:CdtrAgt>
+
+                        <!-- CdtrSchmeId obligatorio -->
+                        <sdd:CdtrSchmeId>
+                            <sdd:Id>
+                                <sdd:PrvtId>
+                                    <sdd:Othr>
+                                        <sdd:Id>
+                                            <xsl:choose>
+                                                <xsl:when
+                                                    test="sct:Dbtr/sct:Id/sct:OrgId/sct:Othr/sct:Id">
+                                                    <xsl:value-of
+                                                        select="sct:Dbtr/sct:Id/sct:OrgId/sct:Othr/sct:Id" />
+                                                </xsl:when>
+                                                <xsl:otherwise>ES9800123456789012345678</xsl:otherwise>
+                                            </xsl:choose>
+                                        </sdd:Id>
+                                        <sdd:SchmeNm>
+                                            <sdd:Prtry>SEPA</sdd:Prtry>
+                                        </sdd:SchmeNm>
+                                    </sdd:Othr>
+                                </sdd:PrvtId>
+                            </sdd:Id>
+                        </sdd:CdtrSchmeId>
+
                         <xsl:for-each select="sct:CdtTrfTxInf">
                             <sdd:DrctDbtTxInf>
                                 <sdd:PmtId>
@@ -107,7 +124,6 @@
                                         <xsl:value-of select="sct:PmtId/sct:EndToEndId" />
                                     </sdd:EndToEndId>
                                 </sdd:PmtId>
-
                                 <sdd:InstdAmt Ccy="{sct:Amt/sct:InstdAmt/@Ccy}">
                                     <xsl:value-of select="sct:Amt/sct:InstdAmt" />
                                 </sdd:InstdAmt>
@@ -129,7 +145,6 @@
                                             </xsl:choose>
                                         </xsl:variable>
                                         <sdd:MndtId>
-                                            <!-- Asegura que el identificador del mandato respete el límite Max35Text recortando cualquier valor más largo para evitar fallos de validación -->
                                             <xsl:value-of select="substring($rawMndtId, 1, 35)" />
                                         </sdd:MndtId>
                                     </sdd:MndtRltdInf>
@@ -141,16 +156,14 @@
                                         </sdd:Nm>
                                     </sdd:UltmtCdtr>
                                 </xsl:if>
-                                <xsl:if test="sct:CdtrAgt/sct:FinInstnId/sct:BICFI">
-                                    <sdd:DbtrAgt>
-                                        <sdd:FinInstnId>
-                                            <sdd:BICFI>
-                                                <xsl:value-of
-                                                    select="sct:CdtrAgt/sct:FinInstnId/sct:BICFI" />
-                                            </sdd:BICFI>
-                                        </sdd:FinInstnId>
-                                    </sdd:DbtrAgt>
-                                </xsl:if>
+                                <sdd:DbtrAgt>
+                                    <sdd:FinInstnId>
+                                        <sdd:BICFI>
+                                            <xsl:value-of
+                                                select="sct:CdtrAgt/sct:FinInstnId/sct:BICFI" />
+                                        </sdd:BICFI>
+                                    </sdd:FinInstnId>
+                                </sdd:DbtrAgt>
                                 <sdd:Dbtr>
                                     <sdd:Nm>
                                         <xsl:value-of select="sct:Cdtr/sct:Nm | ../sct:Cdtr/sct:Nm" />
@@ -161,7 +174,6 @@
                                         </sdd:CtryOfRes>
                                     </xsl:if>
                                 </sdd:Dbtr>
-
                                 <sdd:DbtrAcct>
                                     <sdd:Id>
                                         <sdd:IBAN>
@@ -169,7 +181,6 @@
                                         </sdd:IBAN>
                                     </sdd:Id>
                                 </sdd:DbtrAcct>
-
                                 <xsl:if test="sct:RmtInf/sct:Ustrd">
                                     <sdd:RmtInf>
                                         <sdd:Ustrd>
@@ -179,16 +190,15 @@
                                 </xsl:if>
                             </sdd:DrctDbtTxInf>
                         </xsl:for-each>
-
-
                     </sdd:PmtInf>
                 </xsl:for-each>
             </sdd:CstmrDrctDbtInitn>
         </sdd:Document>
     </xsl:template>
+
     <xsl:template name="mapGrpHdr">
         <xsl:variable name="gh" select="/sct:Document/sct:CstmrCdtTrfInitn/sct:GrpHdr" />
-    <sdd:GrpHdr>
+        <sdd:GrpHdr>
             <xsl:if test="$gh/sct:MsgId"><sdd:MsgId>
                     <xsl:value-of select="$gh/sct:MsgId" />
                 </sdd:MsgId></xsl:if>
@@ -211,6 +221,7 @@
             </xsl:if>
         </sdd:GrpHdr>
     </xsl:template>
+
     <xsl:template match="node()|@*" />
 
 </xsl:stylesheet>

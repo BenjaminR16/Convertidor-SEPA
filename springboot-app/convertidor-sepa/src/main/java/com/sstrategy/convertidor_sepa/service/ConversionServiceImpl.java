@@ -28,11 +28,19 @@ public class ConversionServiceImpl implements ConversionService {
                 "SCT",
                 Map.of(
                         "urn:iso:std:iso:20022:tech:xsd:pain.001.001.03",
-                        new ConversionSpec("/xsd/pain.001.001.03.xsd", "/xslt/sct103-to-sdd108.xslt"),
+                        new ConversionSpec(
+                                "/xsd/pain.001.001.03.xsd",
+                                "/xslt/sct103-to-sdd108.xslt"),
+
                         "urn:iso:std:iso:20022:tech:xsd:pain.001.003.03",
-                        new ConversionSpec("/xsd/pain.001.003.03.xsd", "/xslt/sct303-to-sdd108.xslt"),
+                        new ConversionSpec(
+                                "/xsd/pain.001.003.03.xsd",
+                                "/xslt/sct303-to-sdd108.xslt"),
+
                         "urn:iso:std:iso:20022:tech:xsd:pain.001.001.09",
-                        new ConversionSpec("/xsd/pain.001.001.09.xsd", "/xslt/sct109-to-sdd108.xslt")),
+                        new ConversionSpec(
+                                "/xsd/pain.001.001.09.xsd",
+                                "/xslt/sct109-to-sdd108.xslt")),
                 "/xsd/pain.008.001.08.xsd",
                 "Versión SCT no soportada. Se espera pain.001.001.03, pain.001.001.09 o pain.001.003.03",
                 "Error en conversión SCT→SDD");
@@ -45,22 +53,35 @@ public class ConversionServiceImpl implements ConversionService {
                 "SDD",
                 Map.of(
                         "urn:iso:std:iso:20022:tech:xsd:pain.008.001.02",
-                        new ConversionSpec("/xsd/pain.008.001.02.xsd", "/xslt/sdd102-to-sct109.xslt"),
+                        new ConversionSpec(
+                                "/xsd/pain.008.001.02.xsd",
+                                "/xslt/sdd102-to-sct109.xslt"),
+
                         "urn:iso:std:iso:20022:tech:xsd:pain.008.003.02",
-                        new ConversionSpec("/xsd/pain.008.003.02.xsd", "/xslt/sdd302-to-sct109.xslt"),
+                        new ConversionSpec(
+                                "/xsd/pain.008.003.02.xsd",
+                                "/xslt/sdd302-to-sct109.xslt"),
+
                         "urn:iso:std:iso:20022:tech:xsd:pain.008.001.08",
-                        new ConversionSpec("/xsd/pain.008.001.08.xsd", "/xslt/sdd108-to-sct109.xslt")),
-                "/xsd/pain.001.001.09.xsd",
+                        new ConversionSpec(
+                                "/xsd/pain.008.001.08.xsd",
+                                "/xslt/sdd108-to-sct109.xslt")),
+                Map.of(
+                        "urn:iso:std:iso:20022:tech:xsd:pain.001.001.03", "/xsd/pain.001.001.03.xsd",
+                        "urn:iso:std:iso:20022:tech:xsd:pain.001.003.03", "/xsd/pain.001.003.03.xsd",
+                        "urn:iso:std:iso:20022:tech:xsd:pain.001.001.09", "/xsd/pain.001.001.09.xsd"),
                 "Versión SDD no soportada. Se espera pain.008.001.02, pain.008.001.08 o pain.008.003.02",
                 "Error en conversión SDD→SCT");
     }
 
-    private ConversionResult convert(MultipartFile file,
+    private ConversionResult convert(
+            MultipartFile file,
             String typeLabel,
             Map<String, ConversionSpec> conversionMap,
-            String outputXsd,
+            Object outputXsdConfig,
             String unsupportedMessage,
             String errorPrefix) {
+
         try {
             if (file.isEmpty()) {
                 throw new FileProcessingException("Archivo " + typeLabel + " vacío");
@@ -70,25 +91,45 @@ public class ConversionServiceImpl implements ConversionService {
             XmlUtils.ensureNoDtd(xmlBytes);
             String xmlString = new String(xmlBytes, StandardCharsets.UTF_8);
 
-            // Detectar versión por el namespace
+            // Detectar spec según namespace de entrada
             ConversionSpec spec = conversionMap.entrySet().stream()
                     .filter(entry -> xmlString.contains(entry.getKey()))
                     .map(Map.Entry::getValue)
                     .findFirst()
                     .orElseThrow(() -> new IllegalArgumentException(unsupportedMessage));
 
-            // Validar entrada
             try {
                 validationService.validate(xmlBytes, spec.inputXsd());
             } catch (Exception ignored) {
                 log.warn("Validación inicial falló para {}, continuando transformación...", spec.inputXsd());
             }
-
-            // Transformar
             String convertedXml = XsltTransformer.transform(file, spec.xsltPath());
             log.info("Transformación {} completada con XSLT: {}", typeLabel, spec.xsltPath());
 
-            // Validar salida
+            String outputNamespace = XmlUtils.detectNamespace(convertedXml);
+            log.info("Namespace detectado en salida: ", outputNamespace);
+
+            String outputXsd;
+
+            if (outputXsdConfig instanceof String simpleXsd) {
+                // Caso convertSctToSdd (siempre un único XSD destino)
+                outputXsd = simpleXsd;
+
+            } else if (outputXsdConfig instanceof Map<?, ?> xsdMapRaw) {
+                // Caso convertSddToSct (varios XSD posibles)
+                @SuppressWarnings("unchecked")
+                Map<String, String> xsdMap = (Map<String, String>) xsdMapRaw;
+
+                outputXsd = xsdMap.entrySet().stream()
+                        .filter(e -> outputNamespace.contains(e.getKey()))
+                        .map(Map.Entry::getValue)
+                        .findFirst()
+                        .orElseThrow(() -> new ValidationException(
+                                "No existe XSD de salida para namespace: " + outputNamespace));
+
+            } else {
+                throw new IllegalArgumentException("outputXsdConfig no es ni String ni Map");
+            }
             validationService.validate(convertedXml.getBytes(StandardCharsets.UTF_8), outputXsd);
             log.info("Validación final exitosa contra {}", outputXsd);
 
