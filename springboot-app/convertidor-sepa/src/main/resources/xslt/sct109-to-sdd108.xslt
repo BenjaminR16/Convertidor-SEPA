@@ -113,7 +113,7 @@
                                 </sdd:InstdAmt>
                                 <sdd:DrctDbtTx>
                                     <sdd:MndtRltdInf>
-                                        <sdd:MndtId>
+                                        <xsl:variable name="rawMndtId">
                                             <xsl:choose>
                                                 <xsl:when test="sct:PmtId/sct:InstrId">
                                                     <xsl:value-of select="sct:PmtId/sct:InstrId" />
@@ -127,6 +127,10 @@
                                                         select="concat('MNDT-', position())" />
                                                 </xsl:otherwise>
                                             </xsl:choose>
+                                        </xsl:variable>
+                                        <sdd:MndtId>
+                                            <!-- Asegura que el identificador del mandato respete el límite Max35Text recortando cualquier valor más largo para evitar fallos de validación -->
+                                            <xsl:value-of select="substring($rawMndtId, 1, 35)" />
                                         </sdd:MndtId>
                                     </sdd:MndtRltdInf>
                                 </sdd:DrctDbtTx>

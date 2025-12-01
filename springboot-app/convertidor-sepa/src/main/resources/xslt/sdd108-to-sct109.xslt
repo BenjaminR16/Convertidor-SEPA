@@ -82,11 +82,28 @@
                 </sct:Id>
             </sct:DbtrAcct>
 
+            <!-- DbtrAgt: usar BIC si existe, en caso contrario Othr/Id y finalmente NOTPROVIDED -->
             <sct:DbtrAgt>
                 <sct:FinInstnId>
-                    <sct:BICFI>
-                        <xsl:value-of select="sdd:CdtrAgt/sdd:FinInstnId/sdd:BICFI" />
-                    </sct:BICFI>
+                    <xsl:choose>
+                        <xsl:when test="string-length(normalize-space(sdd:CdtrAgt/sdd:FinInstnId/sdd:BICFI)) &gt; 0">
+                            <sct:BICFI>
+                                <xsl:value-of select="sdd:CdtrAgt/sdd:FinInstnId/sdd:BICFI" />
+                            </sct:BICFI>
+                        </xsl:when>
+                        <xsl:when test="sdd:CdtrAgt/sdd:FinInstnId/sdd:Othr/sdd:Id">
+                            <sct:Othr>
+                                <sct:Id>
+                                    <xsl:value-of select="sdd:CdtrAgt/sdd:FinInstnId/sdd:Othr/sdd:Id" />
+                                </sct:Id>
+                            </sct:Othr>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <sct:Othr>
+                                <sct:Id>NOTPROVIDED</sct:Id>
+                            </sct:Othr>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </sct:FinInstnId>
             </sct:DbtrAgt>
             <xsl:for-each select="sdd:DrctDbtTxInf">
@@ -101,11 +118,28 @@
                             <xsl:value-of select="sdd:InstdAmt" />
                         </sct:InstdAmt>
                     </sct:Amt>
+                    <!-- CdtrAgt replica el fallback de DbtrAgt para mantener el SCT regenerado válido -->
                     <sct:CdtrAgt>
                         <sct:FinInstnId>
-                            <sct:BICFI>
-                                <xsl:value-of select="sdd:DbtrAgt/sdd:FinInstnId/sdd:BICFI" />
-                            </sct:BICFI>
+                            <xsl:choose>
+                                <xsl:when test="string-length(normalize-space(sdd:DbtrAgt/sdd:FinInstnId/sdd:BICFI)) &gt; 0">
+                                    <sct:BICFI>
+                                        <xsl:value-of select="sdd:DbtrAgt/sdd:FinInstnId/sdd:BICFI" />
+                                    </sct:BICFI>
+                                </xsl:when>
+                                <xsl:when test="sdd:DbtrAgt/sdd:FinInstnId/sdd:Othr/sdd:Id">
+                                    <sct:Othr>
+                                        <sct:Id>
+                                            <xsl:value-of select="sdd:DbtrAgt/sdd:FinInstnId/sdd:Othr/sdd:Id" />
+                                        </sct:Id>
+                                    </sct:Othr>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <sct:Othr>
+                                        <sct:Id>NOTPROVIDED</sct:Id>
+                                    </sct:Othr>
+                                </xsl:otherwise>
+                            </xsl:choose>
                         </sct:FinInstnId>
                     </sct:CdtrAgt>
                     <sct:Cdtr>
