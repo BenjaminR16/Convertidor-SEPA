@@ -183,7 +183,7 @@ springboot-app/convertidor-sepa/
 
 ## 9. Errores frecuentes
 
-### ❗ “El fichero XML no cumple el esquema XSD”
+###  “El fichero XML no cumple el esquema XSD”
 
 - El archivo no coincide con el estándar SEPA esperado (`pain.001`, `pain.008`, versión incorrecta, etc.).
 - Puede deberse a:
@@ -191,7 +191,7 @@ springboot-app/convertidor-sepa/
   - Namespace incorrecto.
   - Estructura no compatible con las versiones soportadas.
 
-### ❗ Problemas CORS entre Angular y Spring Boot
+###  Problemas CORS entre Angular y Spring Boot
 
 Si el frontend no puede llamar al backend (errores CORS en consola):
 
