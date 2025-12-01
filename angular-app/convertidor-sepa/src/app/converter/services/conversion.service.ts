@@ -53,8 +53,9 @@ export class ConversionService {
       // Error del lado del cliente o de red
       message = `Error del cliente: ${error.error.message}`;
     } else {
-      // Errores devueltos por el backend 
-      if (typeof error.error === 'string') {
+      if (error.status === 0) {
+        message = 'No se pudo conectar con el servidor. Asegúrate de que el backend esté iniciado.';
+      } else if (typeof error.error === 'string') {
         message = error.error;
       } else if (error.error?.message) {
         message = error.error.message;
