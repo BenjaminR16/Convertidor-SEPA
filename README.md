@@ -24,7 +24,7 @@ Asegúrate de tener instalado:
 
 - Git  
 - Node.js (versión LTS recomendada) y npm  
-- Java 17 (o la versión indicada en el `pom.xml`)  
+- Java 21
 - Maven (solo si no se usa el wrapper `mvnw` incluido)
 
 ---
@@ -139,7 +139,7 @@ http://localhost:4200
 
 ### Backend
 
-- Java 17 / 21  
+- Java 21  
 - Spring Boot (REST API)  
 - Validación con XSD (ISO 20022: `pain.001`, `pain.008`)  
 - Transformaciones XSLT entre:
