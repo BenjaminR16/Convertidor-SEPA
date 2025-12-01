@@ -112,11 +112,9 @@ public class ConversionServiceImpl implements ConversionService {
             String outputXsd;
 
             if (outputXsdConfig instanceof String simpleXsd) {
-                // Caso convertSctToSdd (siempre un único XSD destino)
                 outputXsd = simpleXsd;
 
             } else if (outputXsdConfig instanceof Map<?, ?> xsdMapRaw) {
-                // Caso convertSddToSct (varios XSD posibles)
                 @SuppressWarnings("unchecked")
                 Map<String, String> xsdMap = (Map<String, String>) xsdMapRaw;
 
