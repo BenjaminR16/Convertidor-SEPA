@@ -154,11 +154,14 @@
                             </sct:IBAN>
                         </sct:Id>
                     </sct:CdtrAcct>
-                    <sct:RmtInf>
-                        <sct:Ustrd>
-                            <xsl:value-of select="sdd:RmtInf/sdd:Ustrd" />
-                        </sct:Ustrd>
-                    </sct:RmtInf>
+                    <!-- Emitimos RmtInf solo cuando el texto no está vacío para evitar violar los mínimos de Max140Text -->
+                    <xsl:if test="string-length(normalize-space(sdd:RmtInf/sdd:Ustrd)) &gt; 0">
+                        <sct:RmtInf>
+                            <sct:Ustrd>
+                                <xsl:value-of select="sdd:RmtInf/sdd:Ustrd" />
+                            </sct:Ustrd>
+                        </sct:RmtInf>
+                    </xsl:if>
                 </sct:CdtTrfTxInf>
             </xsl:for-each>
         </sct:PmtInf>
